@@ -59,7 +59,7 @@ public class MovieReservationClient {
 
         System.out.println("시간을 입력해주세요.");
 
-        ArrayList timeArray=new ArrayList<>();
+        ArrayList timeArray=new ArrayList<>(); //아 ArrayList로 빼놧구나 하나면 ArrayList로 안해두 될듯?
         for (Object date : timeArray) {
             System.out.println(date);
         }
@@ -82,7 +82,7 @@ public class MovieReservationClient {
         System.out.println("인원을 입력해주세요.(숫자만 입력해주세요.)");
         int PeopleNum = sc.nextInt();
 
-        List<Pair<String, Boolean>> seatArray=new ArrayList<>();
+        List<Pair<String, Boolean>> seatArray=new ArrayList<>(); //이거 서버한테 보내야함~~
 
         System.out.println("<<좌석 배치도>>");
         System.out.println("  0 1 2 3 4 5 6 7 8");
@@ -105,7 +105,7 @@ public class MovieReservationClient {
             System.out.println();
         }
 
-        ArrayList seatNum = new ArrayList<String>();
+        ArrayList seatNum = new ArrayList<String>(); //이거 서버로 보내야함
         int cnt = 0;
         while (cnt < PeopleNum) {
             System.out.println("좌석을 하나씩 입력해주세요(예: A-3):");
@@ -113,6 +113,41 @@ public class MovieReservationClient {
             seatNum.add(SeatNum);
             cnt++;
         }
+
+//        ArrayList MovieReservationInfo = new ArrayList<>(); //나중에 서버한테 클래스 형태로 받을거임 주석처리 다 빼기
+//        System.out.println("영화 제목 : "+MovieReservationInfo.ReMovieName);
+//        System.out.println("날짜 : "+MovieReservationInfo.ReDate);
+//        System.out.println("시간 : "+MovieReservationInfo.ReTime);
+//        System.out.println("인원 : "+MovieReservationInfo.RePeopleNum);
+//        System.out.print("좌석 :");
+//        for (Object s : MovieReservationInfo.ReSeatNum) { //나중에 지우기
+//            System.out.print(s + ", ");
+//        }
+
+//        System.out.println(); //여기두 주석처리 ㄷ다~~~빼기 까먹고 지우면 큰일남~~ 큰일까지는 아니겟군아;;
+//        System.out.println("정보가 맞는지 확인해주세요. 맞으면 예, 틀리면 아니오를 입력해주세요.");
+//
+//        int infoCheck = 0; //나중에 싹~~~지우기 확인용 다시 하기(OK / No 사인 받고 하기~~)
+//        while (infoCheck == 0) {
+//            String str = sc.next();
+//            if (str.equals("예")) {
+//                infoCheck = 1;
+//                break;
+//            } else if (str.equals("아니오")) {
+//                infoCheck = 2;
+//                break;
+//                // 처음부터 다시 입력받기...
+//            } else {
+//                System.out.println("다시 입력해주세요.");
+//            }
+//        }
+//
+//        if(infoCheck==1){
+//            //서버한테 OK 사인 보내기
+//        }
+//        else if(infoCheck==2){
+//            //서버한테 NO 사인 혹은 영화 예약 페이지 종료하기 -> 종료도 서버에서 하나??
+//        }
     }
 }
 
