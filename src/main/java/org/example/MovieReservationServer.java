@@ -149,7 +149,7 @@ public class MovieReservationServer {
                 String movieName = resultSet.getString(1); // 또는 resultSet.getString("name");
                 System.out.print("영화 제목 : " + movieName + "\n날짜 : " + Date + "\n시간 : " + Time + "\n인원 : " + PeopleNum + "\n좌석 : ");
 //                MovieReservationInfo(movieName, Date, Time, PeopleNum,seatNum); // 나중에 넣기 -> 클라이언트로 보낼 데이터임 근데 클래스 형태로 보내야해서 어떻게 보낼지는 생각해봐야할듯
-                for (Object s : seatNum) { //나중에 지우기
+                for (Object s : seatNum) { //나중에 지우기 -> 향샹된 for문이 아닌 그냥 for문으로해서 마지막 콤마 제거하기
                     System.out.print(s + ", ");
                 }
             }
@@ -173,7 +173,7 @@ public class MovieReservationServer {
             }
 
 
-            //입력받은 정보 다 보내고 ok 사인 받으면 아래 코드 진행
+            //입력받은 정보 클라이언트쪽으로 보내고 클라이언트단에서 ok 사인 받으면 아래 코드 진행
             if(infoCheck==1) {
                 for (int i = 0; i < seatNum.size(); i++) { //seatNum ArrayList는 나중에 클라이언트쪽에서 보내줌
                     String nowSeatNum = (String) seatNum.get(i);
@@ -199,16 +199,19 @@ public class MovieReservationServer {
                     if (resultSet.next()) {
                         seatId = resultSet.getInt("Seatid");
                     }
-                    // 찾은 Seatid를 사용하여 Reservation 테이블에 새로운 레코드를 삽입
                     if (seatId != -1) {
                         String insertQuery = "INSERT INTO Reservation (Seatid, userid) VALUES (?, ?)";
                         pstmt = MySqlTest.dbconn.prepareStatement(insertQuery);
                         pstmt.setInt(1, seatId);  // 찾은 Seatid 사용
-                        pstmt.setString(2, userId);  // userId는 로그인중인 계정을 넣어야함....
+                        pstmt.setString(2, userId);  // userId는 로그인중인 계정을 넣어야함... -> 로그인 유지 방법 생각해서 그에 맞게 변경하기...
 
                         pstmt.executeUpdate();
                     }
                 }
+            }
+            else{
+                System.out.println("영화 예매를 종료하겠습니다. 다시 시작해주세요.");
+                //종료 우찌하지?? 걍 return??
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -230,22 +233,7 @@ public class MovieReservationServer {
     }
 }
 
-class MovieReservationInfo{
-    public String ReMovieName;
-    public String ReDate;
-    public String ReTime;
-    public int RePeopleNum;
-    ArrayList<String> ReSeatNum;
-    MovieReservationInfo(String ReMovieName, String ReDate, String ReTime, int RePeopleNum, ArrayList<String>ReSeatNum) {
-        this.ReMovieName=ReMovieName;
-        this.ReDate=ReDate;
-        this.ReTime=ReTime;
-        this.RePeopleNum=RePeopleNum;
-        this.ReSeatNum=ReSeatNum;
-    }
-}
-
-// Pair class
+// Pair class -> Pair부터 MySqlTest 전까지 다 Pair를 위한...
 class Pair<U, V>
 {
     public final U first;       // 쌍의 첫 번째 필드
@@ -300,7 +288,7 @@ class Pair<U, V>
     }
 }
 
-class MySqlTest{
+class MySqlTest{ //DB용... 지우기말기? 아니면 메인에 하나만 잇어도 될듯??
     String dbDriver="com.mysql.cj.jdbc.Driver";
     String dbUrl="jdbc:mysql://127.0.0.1:3306/comnet?serverTimezone=Asia/Seoul&useSSL=false";
     String dbUser = "comnet";

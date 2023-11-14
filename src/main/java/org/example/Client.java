@@ -29,7 +29,7 @@ public class Client {
     //FOR TEST
     static short HEADER_CODE = 0;
 
-    private static Scanner sc = new Scanner(System.in);
+    private static Scanner sc = new Scanner(System.in); //-----이걸 왜 프라이빗??
 
     public static void main(String[] args) {
         // TODO Auto-generated method stub
@@ -37,11 +37,10 @@ public class Client {
         String hostname = "localhost";
         int port = 1717;
 
-        try(Socket socket = new Socket(hostname, port)) {
+        try(Socket socket = new Socket(hostname, port)) { //소켓 연결
             System.out.println("Connected to Server");
 
             loginPage(socket);
-
         } catch (UnknownHostException e) {
             System.out.println("Server not found: " + e.getMessage());
         } catch (IOException e) {
@@ -52,13 +51,12 @@ public class Client {
     }
     public static void loadMainMenu(){
         int num = 0;
-
         //Scanner sc = new Scanner(System.in);
-        Manager M = new Manager();
+        Manager M = new Manager(); //-----매니저 클래스가 정확하게 뭔지...
 
         do {
             try {
-                sc = new Scanner(System.in);
+                sc = new Scanner(System.in); //-----?? 이걸 왜 다시 선언하나용?
                 //메인 선택창
                 M.displayMainMenu();
                 System.out.printf("번호를 입력해 주세요: ");
@@ -66,7 +64,7 @@ public class Client {
                 num = sc.nextInt();
 
                 if(num > 4) {
-                    System.out.println("잘못 입력했습니다.");
+                    System.out.println("잘못 입력했습니다. 다시 입력해주세요");
                     continue;
                 }
                 switch (num) {
@@ -89,29 +87,37 @@ public class Client {
             }catch(InputMismatchException e){
                 System.out.println("잘못 입력했습니다.");
             }
-        }while(num != 4);
+        }while(num != 4); //-----이게 이 반복이 뭐지....?? num이 4가 아닐동안 반복? -> break로만 종료하게??
 
-        System.out.println("<< 이용해 주셔서 갑사합니다 >>");
+        System.out.println("<< 이용해 주셔서 감사합니다 >>");
     }
 
-    //하기시렇ㅇ
-    public static void loginPage(Socket socket) throws IOException {
 
+    public static void loginPage(Socket socket) throws IOException {
         sc = new Scanner(System.in);
 
-        int menuNum = 0;
-        System.out.println("Here is Login page!!");
+        int menuNum = 3;
+        System.out.println("Here is Login page!!"); //나중에 지우기
         System.out.println("1. 로그인");
         System.out.println("2. 회원가입");
-        System.out.print("입력하세요: ");
+        System.out.print("입력하세요 : ");
 
-        try {
-            String input = sc.nextLine(); // 문자열로 입력 받음
-            menuNum = Integer.parseInt(input); // 문자열을 숫자로 변환
-        } catch (NumberFormatException e) {
-            System.out.println("숫자로 입력해야 합니다.");
-            return;
+        while(true){ //-----이게 좋지 않을까...
+            menuNum=sc.nextInt();
+            if(menuNum==1||menuNum==2){
+                break;
+            }
+            else{
+                System.out.println("잘못 입력했습니다. 다시 입력해주세요.");
+            }
         }
+//        try {
+//            String input = sc.nextLine(); // 문자열로 입력 받음
+//            menuNum = Integer.parseInt(input); // 문자열을 숫자로 변환
+//        } catch (NumberFormatException e) {
+//            System.out.println("숫자로 입력해야 합니다.");
+//            return;
+//        }
 
         switch (menuNum){
             case 1:
@@ -120,12 +126,15 @@ public class Client {
 
                 //receive
                 int data = receiveData(socket);
-                if(C_isOK == 1){
+                if(C_isOK == 1){ //-----이거 다 테스트용인거죠? 지울거죠??
+
                     //서버에서 알겠다고 ok 오면 send
                     System.out.print("아이디: ");
-                    String id = sc.nextLine();
+//                    String id = sc.nextLine();
+                    String id = sc.next(); //-----아이디랑 비밀번호에는 공백이 없으니 next로 받아도될듯해요
                     System.out.print("비밀번호: ");
-                    String pw = sc.nextLine();
+//                    String pw = sc.nextLine();
+                    String pw = sc.next();
 
                     Login.LoginInfo logInfo = new Login.LoginInfo(id, pw);
 
@@ -135,7 +144,7 @@ public class Client {
                     final int idNum = C_idNum;
                     System.out.printf("idNum: %d\n",idNum);
 
-                    if(C_menuNum >= 4)
+                    if(C_menuNum >= 4) //-----이게 뭐죠?? 이상한 숫자가 들어오면 그냥 메인페이지 글자 다시 출력인지요?
                         loadMainMenu();
                 }
                 break;
@@ -147,16 +156,16 @@ public class Client {
     //send Object
     public static void sendObjectData(Socket socket, int menuNum,Object obj) throws IOException {
         System.out.println("Client :: sendObjectData() ::");   //FOR DEBUG
-        //Person 객체 생성. 인자로 3 넣어줌.
+        //Person 객체 생성. 인자로 3 넣어줌. ----- 이건 뭐 없는거같은데 객체생성이 어디잇는지.....
 
         //생성한 객체를 byte array로 변환
-        byte[] objectData = toByteArray(obj);   //앞에 2byte엔 헤더 붙여야됨
+        byte[] objectData = toByteArray(obj);   //앞에 2byte엔 헤더 붙여야됨 -----2byte == 16bit
         //System.out.printf("Object data size: 0x%x\n",objectData.length); // 객체 사이즈 출력
         // 새로운 바이트 배열을 생성 (헤더 크기 + 객체 데이터 크기)
         byte[] dataWithHeader =  new byte[2 + objectData.length];
 
         int header=0;
-        HEADER_CODE = 0x640;
+        HEADER_CODE = 0x640; //-----어디에 해당하는 헤더코드?? 이게 0이네용
         header = parseData_en(menuNum);
         System.out.printf("header: 0x%x\n",header);
         byte[] headerArr = new byte[2];
@@ -234,7 +243,7 @@ public class Client {
         if (nReadSize > 0) {
             // 역직렬화를 위해 toObject 메소드 수정 필요
 
-            Login.LoginInfo loginInfo = toObject(objectData,Login.LoginInfo.class);
+            Login.LoginInfo loginInfo = toObject(objectData,Login.LoginInfo.class); //-----굿노트에 올린 질문...
             //Login.LoginInfo loginInfo = toObject(recvBuffer,Login.LoginInfo.class);
             // 객체 사용
             System.out.println("Received ID: " + loginInfo.id);
@@ -275,17 +284,17 @@ public class Client {
         OutputStream os = socket.getOutputStream();
 
         int header=0;
-        HEADER_CODE = 0x440;
+        HEADER_CODE = 0x440; //-----0x == 16진수 (0b == 2진수)
         header = parseData_en(menuNum) << 16;
         System.out.printf("header: 0x%x\n",header);
 
-        data |= header;
+        data |= header; //-----데이터에 헤더를 붙이는??
 
         System.out.printf("data: 0x%x\n",data);
         // 4바이트 크기의 버퍼를 생성합니다.
         byte[] buffer = new byte[4];
 
-        buffer[0] = (byte) (data >> 24);
+        buffer[0] = (byte) (data >> 24); //-----이게 뭔지요??
         buffer[1] = (byte) (data >> 16);
         buffer[2] = (byte) (data >> 8);
         buffer[3] = (byte) (data);
@@ -335,9 +344,9 @@ public class Client {
 
     static int parseData_de(int DataType, int value)
     {
-        //dataType = 1 => 헤더, 데이터 모두 전달
+        //dataType = 1 => 헤더, 데이터 모두 전달 //------ 1이면 데이터가 존재한다는 의미인지요...
         //dataType = 2 => 헤더 값만 전달
-        short header = 0;//
+        short header = 0; //----- 2byte == 16 bits
         int data = 0;
 
         if(DataType == 1) {

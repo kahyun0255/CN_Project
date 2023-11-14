@@ -59,9 +59,6 @@ public class ClientHandler extends Thread {
                 else{
                     sendData(socket,LOGIN,0);
                 }
-
-
-
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -292,7 +289,7 @@ public class ClientHandler extends Thread {
         return enValue;
 
     }
-    private void disconnect() {
+    private void disconnect() { //----- == 로그아웃
         System.out.println("ClientHandler Class: disconnect()"); //FOR_DEBUG
         if (name != null) {
             clientHandlers.remove(this);

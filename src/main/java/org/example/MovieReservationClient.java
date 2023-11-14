@@ -120,7 +120,7 @@ public class MovieReservationClient {
 //        System.out.println("시간 : "+MovieReservationInfo.ReTime);
 //        System.out.println("인원 : "+MovieReservationInfo.RePeopleNum);
 //        System.out.print("좌석 :");
-//        for (Object s : MovieReservationInfo.ReSeatNum) { //나중에 지우기
+//        for (Object s : MovieReservationInfo.ReSeatNum) { //향상된 for문이 아닌 그냥 for문으로 해서 마지막 콤마 제거하기
 //            System.out.print(s + ", ");
 //        }
 

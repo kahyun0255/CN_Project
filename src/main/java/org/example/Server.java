@@ -16,7 +16,7 @@ public class Server {
                 // Handle the client in a separate thread
                 new ClientHandler(socket).start();
 
-                //시작되면 서버가 로그인 되어있는지 확인 메세지 보내
+                //시작되면 서버가 로그인 되어있는지 확인 메세지 보내 -> 네 알겟더요.
 
             }
         } catch (IOException e) {
