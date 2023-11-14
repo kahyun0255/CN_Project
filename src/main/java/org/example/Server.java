@@ -3,6 +3,9 @@ package org.example;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Server {
     public static void main(String[] args) {
@@ -14,7 +17,7 @@ public class Server {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
                 // Handle the client in a separate thread
-                new ClientHandler(socket).start();
+//                new ClientHandler(socket).start();
 
                 //시작되면 서버가 로그인 되어있는지 확인 메세지 보내 -> 네 알겟더요.
 
@@ -25,3 +28,4 @@ public class Server {
         }
     }
 }
+

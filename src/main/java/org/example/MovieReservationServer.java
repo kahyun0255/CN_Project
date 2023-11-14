@@ -288,29 +288,29 @@ class Pair<U, V>
     }
 }
 
-class MySqlTest{ //DB용... 지우기말기? 아니면 메인에 하나만 잇어도 될듯??
-    String dbDriver="com.mysql.cj.jdbc.Driver";
-    String dbUrl="jdbc:mysql://127.0.0.1:3306/comnet?serverTimezone=Asia/Seoul&useSSL=false";
-    String dbUser = "comnet";
-    String dbPassword = "cat1234";
-
-    public static Connection dbconn=null;
-
-    public void dbConnection(){
-        Connection connection = null;
-
-        try
-        {
-            Class.forName(dbDriver);
-            connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-            dbconn = connection;
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
-        catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-}
+//class MySqlTest{ //DB용... 지우기말기? 아니면 메인에 하나만 잇어도 될듯??
+//    String dbDriver="com.mysql.cj.jdbc.Driver";
+//    String dbUrl="jdbc:mysql://127.0.0.1:3306/comnet?serverTimezone=Asia/Seoul&useSSL=false";
+//    String dbUser = "comnet";
+//    String dbPassword = "cat1234";
+//
+//    public static Connection dbconn=null;
+//
+//    public void dbConnection(){
+//        Connection connection = null;
+//
+//        try
+//        {
+//            Class.forName(dbDriver);
+//            connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+//            dbconn = connection;
+//        }
+//        catch (SQLException e)
+//        {
+//            e.printStackTrace();
+//        }
+//        catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//}
