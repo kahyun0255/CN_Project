@@ -1,4 +1,4 @@
-package org.example;
+package Client;
 
 public class Movie {
     int movieNum = 0;

@@ -1,4 +1,4 @@
-package org.example;
+package Server;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class MySqlTest {
     String dbDriver="com.mysql.cj.jdbc.Driver";
-    String dbUrl="jdbc:mysql://127.0.0.1:3306/comnet?serverTimezone=Asia/Seoul&useSSL=false";
+    String dbUrl="jdbc:mysql://127.0.0.1:3306/comnet?serverTimezone=Asia/Seoul&useSSL=false&&allowPublicKeyRetrieval=true";
     String dbUser = "comnet";
     String dbPassword = "cat1234";
 

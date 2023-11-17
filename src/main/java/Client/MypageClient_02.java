@@ -11,7 +11,7 @@
 //public class MypageClient_02 {
 //    public static void main(String[] args) {
 //        String serverAddress = "localhost";
-//        int serverPort = 8080;
+//        int serverPort = 8081;
 //
 //        try (Socket socket = new Socket(serverAddress, serverPort);
 //             DataOutputStream out = new DataOutputStream(socket.getOutputStream());

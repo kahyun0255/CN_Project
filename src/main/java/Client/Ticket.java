@@ -1,4 +1,4 @@
-package org.example;
+package Client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class Ticket {
 
     public Ticket() {}
 
-    public void ticketing(User u,int [][]seat, String movietitle) {
+    public void ticketing(User u, int [][]seat, String movietitle) {
 
         System.out.print("예약할 인원 수를 입력하세요: ");
         p_number = sc.nextInt();
