@@ -2,6 +2,7 @@ package Client;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import org.example.MovieReservationObject;
@@ -10,9 +11,9 @@ import org.example.Pair;
 public class MovieReservationClient {
     MovieReservationObject movieReservationObject = new MovieReservationObject();
     Scanner sc = new Scanner(System.in);
+    String Protocol = "0x000001101";
 
-
-    int MovieReservationMovieName(Client client, MovieReservationObject.MovieName movieNameArray) throws IOException {
+    int MovieReservationMovieName(Client client, MovieReservationObject.MovieName movieNameArray) {
         System.out.println("영화 번호를 입력해주세요.");
         int MovieId;
 
@@ -22,25 +23,30 @@ public class MovieReservationClient {
             System.out.println(movieId + ", " + movieName);
         }
         while (true) {
-            MovieId = sc.nextInt();
-            boolean movieIdExists = false;
+            try{
+                MovieId = sc.nextInt();
+                boolean movieIdExists = false;
 
-            for (Pair<Integer, String> pair : movieNameArray.movieNumArray) {
-                if (pair.first.equals(MovieId)) {
-                    movieIdExists = true;
-                    break; // 일치하는 영화 ID를 찾았으므로 더 이상 반복할 필요가 없음
+                for (Pair<Integer, String> pair : movieNameArray.movieNumArray) {
+                    if (pair.first.equals(MovieId)) {
+                        movieIdExists = true;
+                        break; // 일치하는 영화 ID를 찾았으므로 더 이상 반복할 필요가 없음
+                    }
                 }
-            }
 
-            if (!movieIdExists) {
-                System.out.println("입력하신 번호의 영화가 존재하지 않습니다. 영화 번호를 다시 입력해주세요.");
-            } else {
-                break;
+                if (!movieIdExists) {
+                    System.out.println("입력하신 번호의 영화가 존재하지 않습니다. 영화 번호를 다시 입력해주세요.");
+                } else {
+                    break;
+                }
+            }catch (InputMismatchException e) {
+                System.out.println("숫자를 입력해야 합니다. 다시 시도해주세요.");
+                sc.next(); // 입력 버퍼 초기화
             }
         }
         return MovieId;
     }
-    String MovieReservationDate(Client client, MovieReservationObject.MovieDate dateArray) throws IOException {
+    String MovieReservationDate(Client client, MovieReservationObject.MovieDate dateArray) {
         System.out.println("날짜를 입력해주세요.");
 //        ArrayList dateArray = new ArrayList<>(); //나중에 바꾸기 -> 서버에서 받아온 ArrayList로
         for (Object date : dateArray.dateArray) {
@@ -62,7 +68,7 @@ public class MovieReservationClient {
         return Date;
     }
 
-    String MovieReservationTime(Client client, MovieReservationObject.MovieTime timeArray) throws IOException {
+    String MovieReservationTime(Client client, MovieReservationObject.MovieTime timeArray) {
         System.out.println("시간을 입력해주세요.");
 
 //        ArrayList timeArray = new ArrayList<>(); //아 ArrayList로 빼놧구나 하나면 ArrayList로 안해두 될듯?
@@ -85,7 +91,7 @@ public class MovieReservationClient {
         return Time;
     }
 
-    ArrayList MovieReservationSeat(Client client, MovieReservationObject.MovieSeat seatArray) throws IOException {
+    ArrayList MovieReservationSeat(Client client, MovieReservationObject.MovieSeat seatArray) {
         System.out.println("인원을 입력해주세요.(숫자만 입력해주세요.)");
         int PeopleNum = sc.nextInt();
 
@@ -123,7 +129,7 @@ public class MovieReservationClient {
         return seatNum;
     }
 
-    int MovieReservationInfo(Client client, MovieReservationObject.MovieInfo movieInfo) throws IOException {
+    int MovieReservationInfo(Client client, MovieReservationObject.MovieInfo movieInfo) {
 //        ArrayList MovieReservationInfo = new ArrayList<>(); //나중에 서버한테 클래스 형태로 받을거임 주석처리 다 빼기
         System.out.println("영화 제목 : "+movieInfo.InfoMovieName);
         System.out.println("날짜 : "+movieInfo.InfoMovieDate);

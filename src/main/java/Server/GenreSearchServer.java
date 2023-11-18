@@ -1,4 +1,5 @@
-package Server;// GenreSearchServer.java
+package Server;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,56 +11,48 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import org.example.GenreSearchObject;
+import org.example.Pair;
 
 public class GenreSearchServer {
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dbplus";
-    private static final String JDBC_USER = "root";
-    private static final String JDBC_PASSWORD = "1234";
+    MySqlTest mySqlTest = new MySqlTest();
+    Scanner sc = new Scanner(System.in);
+    PreparedStatement pstmt = null;
+    ResultSet resultSet = null;
+    public ArrayList<Pair<Integer,String>> getDistinctGenres(ClientHandler clientHandler) throws SQLException {
+        ArrayList<Pair<Integer,String>> genres = new ArrayList<>();
+        new MySqlTest().dbConnection();
+        int idx=1;
 
-    public static Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
-    }
+        pstmt = mySqlTest.dbconn.prepareStatement(
+                "SELECT DISTINCT genre1 FROM movie UNION SELECT DISTINCT genre2 FROM movie"
+        );
 
-    public static List<String> getDistinctGenres(Connection connection) throws SQLException {
-        List<String> genres = new ArrayList<>();
-        String sql = "SELECT DISTINCT genre1 FROM movie UNION SELECT DISTINCT genre2 FROM movie";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                String genre = resultSet.getString("genre1");
-                genres.add(genre);
-            }
+        resultSet = pstmt.executeQuery();
+        while (resultSet.next()) {
+            String columnValue = resultSet.getString(1); // 첫 번째 컬럼 값 가져오기
+            Pair<Integer, String> p=Pair.of(idx,columnValue);
+            genres.add(p);
+            idx++;
         }
         return genres;
     }
 
-    public static void searchMoviesByGenre(Connection connection, Socket clientSocket) throws SQLException, IOException {
-        // 바이트로 받은 데이터를 읽어옴
-        ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-        String selectedGenre = ois.readUTF();
+    public ArrayList<String> searchMoviesByGenre(ClientHandler clientSocket, GenreSearchObject.GenreName genreName) throws SQLException, IOException {
+        new MySqlTest().dbConnection();
+        pstmt = mySqlTest.dbconn.prepareStatement(
+                "SELECT name FROM movie WHERE genre1 = ? OR genre2 = ?"
+        );
+        pstmt.setString(1, genreName.Name);
+        pstmt.setString(2, genreName.Name);
+        resultSet = pstmt.executeQuery();
 
-        String sql = "SELECT name FROM movie WHERE genre1 = ? OR genre2 = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, selectedGenre);
-            preparedStatement.setString(2, selectedGenre);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            // 결과를 리스트로 저장
-            List<String> movieNames = new ArrayList<>();
-            while (resultSet.next()) {
-                String movieName = resultSet.getString("Name");
-                movieNames.add(movieName);
-            }
-
-            // 리스트를 바이트 배열로 변환하여 클라이언트에게 전송
-            ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            oos.writeObject(movieNames);
-            oos.flush();
+        ArrayList movieNames = new ArrayList<>();
+        while (resultSet.next()) {
+            String movieName = resultSet.getString("Name");
+            movieNames.add(movieName);
         }
+        return movieNames;
     }
 }

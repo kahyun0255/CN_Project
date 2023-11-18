@@ -6,8 +6,30 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+//import org.example.GenreSearchObject;
+//import org.example.GenreSearchObject.GenreList;
+//import org.example.GenreSearchObject.GenreMovieName;
+//import org.example.Login;
+//import org.example.MovieReservationObject;
+//import org.example.MovieReservationObject.MovieDate;
+//import org.example.MovieReservationObject.MovieInfo;
+//import org.example.MovieReservationObject.MovieName;
+//import org.example.MovieReservationObject.MovieSeat;
+//import org.example.MovieReservationObject.MovieSeatNum;
+//import org.example.MovieReservationObject.MovieTime;
+//import org.example.MyPageObject;
+//import org.example.MyPageObject.MyPageInfo;
+//import org.example.Pair;
 
 import org.example.*;
+import org.example.GenreSearchObject.GenreList;
+import org.example.GenreSearchObject.GenreMovieName;
+import org.example.MovieReservationObject.MovieDate;
+import org.example.MovieReservationObject.MovieInfo;
+import org.example.MovieReservationObject.MovieName;
+import org.example.MovieReservationObject.MovieSeat;
+import org.example.MovieReservationObject.MovieTime;
+import org.example.MyPageObject.MyPageInfo;
 
 public class Client {
     public Socket socket;
@@ -30,13 +52,11 @@ public class Client {
     public static int C_idNum = 0;
     public static int C_isOK = 0;
 
-
     private static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        LoginClient Login = new LoginClient();
-
         // TODO Auto-generated method stub
+        LoginClient Login = new LoginClient();
         System.out.println("Client :: main()"); //FOR_DEBUG
         String hostname = "localhost";
         int port = 7778;
@@ -44,18 +64,17 @@ public class Client {
         try {
             Socket socket=new Socket(hostname, port);
             System.out.println("Connected to Server");
-            Client client = new Client(socket);
+            Client clinet = new Client(socket);
 
 
-            Login.loginPage(socket);
+            clinet.loadMainMenu(socket);
+//            Login.loginPage(socket);
 
         } catch (UnknownHostException e) {
             System.out.println("Server not found: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("I/O error: " + e.getMessage());
         }
-
-
     }
 
 //    public void loginPage(Socket socket) throws IOException {
@@ -83,32 +102,31 @@ public class Client {
 //        if(menuNum==1) {
 //            //서버에 로그인 정보가 갈꺼라고 send
 //            sendData(socket, LOGIN, 1);
+//    public void loginPage(Socket socket) throws IOException {
 //
-//            //receive
-//            int data = receiveData(socket);
-//            if (C_isOK == 1) {
-//                //서버에서 알겠다고 ok 오면 send
-//                System.out.print("아이디: ");
-//                String id = sc.next();
-//                System.out.print("비밀번호: ");
-//                String pw = sc.next();
+//        System.out.println("\nClient :: loginPage()"); //FOR_DEBUG
+//        sc = new Scanner(System.in);
 //
-//                C_isOK = 0;
-//                Login.LoginInfo logInfo = new Login.LoginInfo(id, pw);
-//                sendObjectData(socket, LOGIN, logInfo);
+//        int menuNum = 0;
 //
-//                receiveData(socket);
-//                final int idNum = C_idNum;
-//                System.out.printf("idNum: %d\n", idNum);
-//                if(C_isOK == 1)
-//                {
-//                    System.out.println("로그인에 성공하셨습니다");
-//                    loadMainMenu(socket);
-//                }
-//                else {
-//                    System.out.println("로그인에 실패하셨습니다");
-//                }
-//                C_isOK = 0;
+//        System.out.println("1. 로그인");
+//        System.out.println("2. 회원가입");
+//        System.out.print("입력하세요: ");
+//
+//        //입력값 체크
+//        while(true){
+//            menuNum=sc.nextInt();
+//            if(menuNum>2){
+//                System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
+//            }
+//            else{
+//                break;
+//            }
+//        }
+//
+//        if(menuNum==1) {
+//            //서버에 로그인 정보가 갈꺼라고 send
+//            sendData(socket, LOGIN, 1);
 //
 //            }
 //        }
@@ -137,17 +155,19 @@ public class Client {
 //                    System.out.println("회원가입이 완료되었습니다.");
 //                    C_isOK = 0; //변수 초기화
 //                    loginPage(socket);
-//                }
+//                 }
 //            }
 //        }
 //
 //
 //
 //    }
+
     public void loadMainMenu(Socket socket) throws IOException{
         int inputNum;
 
         System.out.println("\nClient :: loadMainMenu()"); //FOR_DEBUG
+
         //숫자 말고 다른게 들어올 때 처리
         while(true){
             System.out.println("1. 영화 예매");
@@ -196,12 +216,32 @@ public class Client {
                 MovieReservationObject.MovieSeatNum inputMovieSeatObject = new MovieReservationObject.MovieSeatNum(
                         inputmovieSeat);
                 sendObjectData(socket, RESERVATION, inputMovieSeatObject); //선택한 시트 보내
-                //////////
 
                 byte[] InfoObjectData = receiveObjectData(socket);
                 MovieReservationObject.MovieInfo movieInfo = toObject(InfoObjectData, MovieReservationObject.MovieInfo.class);
                 int InfoCheck = movieReservationClient.MovieReservationInfo(this, movieInfo);
                 sendData(socket, RESERVATION, InfoCheck);
+            }
+            else if(inputNum==2){
+                GenreSearchClient genreSearchClient = new GenreSearchClient();
+                sendData(socket,GENRE,GENRE);
+
+                byte[] genreListObjectData=receiveObjectData(socket);
+                GenreSearchObject.GenreList genreList=toObject(genreListObjectData, GenreList.class);
+                String genreNumber=genreSearchClient.GenreSearchList(this, genreList);
+                GenreSearchObject.GenreName genreNumObject = new GenreSearchObject.GenreName(genreNumber);
+                sendObjectData(socket, GENRE, genreNumObject); //선택한 시트 보내
+
+                byte[] movieListObjectData=receiveObjectData(socket);
+                GenreSearchObject.GenreMovieName movieList=toObject(movieListObjectData, GenreMovieName.class);
+                genreSearchClient.MovieNamePrint(this, movieList);
+            }
+            else if(inputNum==3){
+                sendData(socket,MYINFO,MYINFO);
+
+                byte[] MovidInfoObjectData = receiveObjectData(socket);
+                MyPageObject.MyPageInfo movieInfoObject = toObject(MovidInfoObjectData, MyPageInfo.class);
+                MypageClient_02.MyPageClinet(this, movieInfoObject); //선택한 날짜
             }
             else if(inputNum==4){
                 sendData(socket, 9,9);
@@ -214,10 +254,11 @@ public class Client {
     //send Object
     public static void sendObjectData(Socket socket, int menuNum,Object obj) throws IOException {
         System.out.println("\nClient :: sendObjectData() ::");   //FOR DEBUG
-        //Person 객체 생성. 인자로 3 넣어줌.
 
-        C_dataType = 1;
-        C_isData = 1;
+        C_dataType=1;
+        C_isData=1;
+
+
         //생성한 객체를 byte array로 변환
         byte[] objectData = toByteArray(obj);   //앞에 2byte엔 헤더 붙여야됨
         //System.out.printf("Object data size: 0x%x\n",objectData.length); // 객체 사이즈 출력
@@ -225,7 +266,6 @@ public class Client {
         byte[] dataWithHeader =  new byte[2 + objectData.length];
 
         int header=0;
-
         header = parseData_en(menuNum);
         System.out.printf("header: 0x%x\n",header);
         byte[] headerArr = new byte[2];
@@ -347,8 +387,8 @@ public class Client {
 
     //send Byte
     public static void sendData(Socket socket,int menuNum,int data)throws IOException{
-
         System.out.println("\nClient :: sendData() ::");   //FOR DEBUG
+
         OutputStream os = socket.getOutputStream();
 
         int header=0;
@@ -363,7 +403,7 @@ public class Client {
 
         data |= header;
 
-        System.out.printf("SendData: 0x%x\n",data);
+        System.out.printf("Senddata: 0x%x\n",data);
         // 4바이트 크기의 버퍼를 생성합니다.
         byte[] buffer = new byte[4];
 
@@ -377,7 +417,7 @@ public class Client {
         os.flush(); // 버퍼에 남아있는 데이터를 모두 전송합니다.
     }
     public static int receiveData(Socket socket) throws IOException{
-        System.out.println("\nClient :: receiveData() ::");
+        System.out.println("\nSever:: receiveData() ::");
         //서버 통신
         InputStream is = socket.getInputStream();
 
@@ -420,7 +460,7 @@ public class Client {
         System.out.println("\nClient :: parseData_de() ::");
         //dataType = 1 => 헤더, 데이터 모두 전달
         //dataType = 2 => 헤더 값만 전달
-        short header = 0;//
+        short header = 0;
         int data = 0;
 
         if(DataType == 1) {
@@ -461,16 +501,14 @@ public class Client {
         short header = 0;
         //TEST
         //Login menu : 0x440;
+
         C_networkType = 0;
         C_menuNum = menuNum;
-
         header = (short)(((C_networkType << 15) & 0x8000)|((C_isError << 14) & 0x6000)|
                 ((C_errorCode << 11) & 0x3800)|((C_isData << 10) & 0x600)|
                 ((C_dataType << 9) & 0x200)|((C_menuNum << 6) & 0x1C0)|
                 ((C_idNum << 1) & 0x3E)|(C_isOK  & 0x1));
-
         System.out.printf("\nClient :: parseData_en() :: header: 0x%x\n",header);
-
         return header;
 
     }

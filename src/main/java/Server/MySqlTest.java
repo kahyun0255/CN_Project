@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class MySqlTest {
     String dbDriver="com.mysql.cj.jdbc.Driver";
-    String dbUrl="jdbc:mysql://127.0.0.1:3306/comnet?serverTimezone=Asia/Seoul&useSSL=false&&allowPublicKeyRetrieval=true";
+    String dbUrl="jdbc:mysql://127.0.0.1:3306/comnet?serverTimezone=Asia/Seoul&useSSL=false";
     String dbUser = "comnet";
     String dbPassword = "cat1234";
 

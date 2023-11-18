@@ -24,12 +24,14 @@ public class LoginServer {
 
         String inputId="kkh1234";
         String inputPw="kk1234";
-        resultSet = mySqlTest.dbconn.createStatement().executeQuery("SELECT * FROM userinfo WHERE id = ? and password=?"); //데이터베이스에서 긁어오기
+        pstmt = mySqlTest.dbconn.prepareStatement(
+                "SELECT * FROM userinfo WHERE id = ? and password = ?"
+        );
         pstmt.setString(1, inputId);
         pstmt.setString(2, inputPw);
-        ResultSet rs = pstmt.executeQuery();
+        resultSet = pstmt.executeQuery();
 
-        if (rs.next()) {
+        if (resultSet.next()) {
             // 결과 집합에 최소 한 개의 행이 있다면, 아이디가 존재함
             IdNum = 1;
             IsOK = 1;

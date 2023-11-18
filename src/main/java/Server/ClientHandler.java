@@ -9,10 +9,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import org.example.GenreSearchObject;
+import org.example.GenreSearchObject.GenreList;
+import org.example.GenreSearchObject.GenreName;
 import org.example.Login;
 import org.example.Login.LoginInfo;
 import org.example.MovieReservationObject;
@@ -45,6 +49,7 @@ public class ClientHandler extends Thread {
     public static int IdNum = 0;
     public static int IsOK = 0;
 
+
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
@@ -61,31 +66,30 @@ public class ClientHandler extends Thread {
 
                 if(data == 1){  //LOGIN SERVICE
                     LoginServer login = new LoginServer();
-
                     login.loginServer(socket);
-
                 }
                 else if(data == 2) {  //회원가입
                     //DB에서 데이터 받아옴
                     IsOK = 1;
-                    sendData(socket,JOIN,0);
+                    sendData(socket, JOIN, 0);
                     receiveObjectData(socket);
-
                     //받은 정보 DB에 저장
-
                     //저장완료되면 ok 사인 보내기
                     IsOK = 1;
-                    sendData(socket,JOIN,0);
-
+                    sendData(socket, JOIN, 0);
                 }
+                else if(data==8){
+                    MypageSever_02 myPageServer = new MypageSever_02();
 
-                else if(data==5){ //영화 예매
+                    Object outputMovieInfo = myPageServer.Mypage(this,"kkh1234"); //선택한 시간 보내기
+                    sendObjectData(socket, 8, outputMovieInfo); //시트 정보 보내기
+                }
+                else if(data==RESERVATION){ //영화 예매
                     MovieReservationServer movieReservationServer=new MovieReservationServer();
 
                     ArrayList<Pair<Integer,String>>movieName=movieReservationServer.MovieReservationMovieName(this);
                     MovieReservationObject.MovieName movieNameObject=new MovieReservationObject.MovieName(movieName);
                     sendObjectData(socket,5, movieNameObject);
-                    //영화 목록 보내기 성공
 
                     int movieId=receiveData(socket);
                     ArrayList movieDate=movieReservationServer.MovieReservationDate(this,movieId);
@@ -112,6 +116,19 @@ public class ClientHandler extends Thread {
                     int infoCheck=receiveData(socket);
                     movieReservationServer.MovieReservation(this,movieId,inputmovieDate, inputmovieTime, inputmovieSeatNum, infoCheck);
                 }
+                else if(data==GENRE){
+                    GenreSearchServer genreSearchServer=new GenreSearchServer();
+
+                    ArrayList<Pair<Integer,String>> genreList=genreSearchServer.getDistinctGenres(this);
+                    GenreSearchObject.GenreList genreListObject=new GenreSearchObject.GenreList(genreList);
+                    sendObjectData(socket, GENRE, genreListObject);
+
+                    byte[] ObjectGenreNumObject=receiveObjectData(socket);
+                    GenreSearchObject.GenreName MovieNum=toObject(ObjectGenreNumObject, GenreName.class);
+                    ArrayList<String> outputMovieNum=genreSearchServer.searchMoviesByGenre(this,MovieNum);
+                    GenreSearchObject.GenreMovieName outputMovieNumObject=new GenreSearchObject.GenreMovieName(outputMovieNum);
+                    sendObjectData(socket,GENRE,outputMovieNumObject);
+                }
                 else if(data==9){
                     break;
                 }
@@ -129,10 +146,9 @@ public class ClientHandler extends Thread {
     }
     public static void sendObjectData(Socket socket, int menuNum,Object obj) throws IOException {
         System.out.println("\nServer :: sendObjectData() ::");   //FOR DEBUG
-        //Person 객체 생성. 인자로 3 넣어줌.
 
-        DataType = 1;
-        IsData = 1;
+        DataType=1;
+        IsData=1;
 
         //생성한 객체를 byte array로 변환
         byte[] objectData = toByteArray(obj);   //앞에 2byte엔 헤더 붙여야됨
@@ -141,7 +157,6 @@ public class ClientHandler extends Thread {
         byte[] dataWithHeader =  new byte[2 + objectData.length];
 
         int header=0;
-
         header = parseData_en(menuNum);
         System.out.printf("header: 0x%x\n",header);
         byte[] headerArr = new byte[2];
@@ -256,15 +271,14 @@ public class ClientHandler extends Thread {
             //TODO: Handle the exception
             //System.out.println("&&&&&&&");
         }
-
         return type.cast(obj);
     }
 
 
     //send Byte
     public static void sendData(Socket socket,int menuNum,int data)throws IOException{
-
         System.out.println("\nServer :: sendData() ::");
+
         OutputStream os = socket.getOutputStream();
 
         int header=0;
@@ -289,14 +303,13 @@ public class ClientHandler extends Thread {
         buffer[2] = (byte) (data >> 8);
         buffer[3] = (byte) (data);
 
-
         // 바이트 배열을 스트림을 통해 전송합니다.
         os.write(buffer);
         os.flush(); // 버퍼에 남아있는 데이터를 모두 전송합니다.
     }
 
     public static int receiveData(Socket socket) throws IOException{
-        System.out.println("\nSever:: receiveData()");
+        System.out.println("\nSever:: receiveData() ::");
         //서버 통신
         InputStream is = socket.getInputStream();
 
@@ -342,14 +355,14 @@ public class ClientHandler extends Thread {
         int data = 0;
 
         if(dataType == 1) {
+            System.out.println("dataType 1\n");
             header = (short)(value >> 16) ;
             data = value & 0xFF;
         }
         else if(dataType == 2){
             header = (short)value;
         }
-
-        System.out.printf(" h: 0x%x, d: 0x%x\n",header, data);
+        System.out.printf("  h: 0x%x, d: 0x%x\n",header, data);
 
         NetworkType = (header >> 15) & 0x01;
         IsError = (header >> 14) & 0x01;
@@ -362,7 +375,6 @@ public class ClientHandler extends Thread {
 
         System.out.printf("nt: %x, iE: %x, eC: %x, iD: %x, dT: %x, mN: %x, iN: %x, iO:%x\n"
                 ,NetworkType,IsError,ErrorCode,IsData,DataType,MenuNum,IdNum,IsOK);
-
         if(dataType == 1) {
             return data;
         }
@@ -382,18 +394,14 @@ public class ClientHandler extends Thread {
         //Login menu : 0x440;
         NetworkType = 1;
         MenuNum = menuNum;
-
         header = (short)(((NetworkType << 15) & 0x8000)|((IsError << 14) & 0x6000)|
                 ((ErrorCode << 11) & 0x3800)|((IsData << 10) & 0x600)|
                 ((DataType << 9) & 0x200)|((MenuNum << 6) & 0x1C0)|
                 ((IdNum << 1) & 0x3E)|(IsOK  & 0x1));
-
         System.out.printf("Server :: parseData_en() :: header: 0x%x\n",header);
-
         return header;
 
     }
-
     private void disconnect() { //----- == 로그아웃
         System.out.println("\nServer :: disconnect()"); //FOR_DEBUG
         if (name != null) {
