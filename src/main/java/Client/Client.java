@@ -64,11 +64,16 @@ public class Client {
         try {
             Socket socket=new Socket(hostname, port);
             System.out.println("Connected to Server");
+
             Client clinet = new Client(socket);
 
+            String name="user"+(int)(Math.random()*10);
+            Thread sendThread = new SenderThread(socket,name);
+            sendThread.start();
 
+            //Login.loginPage(socket);
             clinet.loadMainMenu(socket);
-//            Login.loginPage(socket);
+            //로그인 구현되면 로그인 먼저 호출
 
         } catch (UnknownHostException e) {
             System.out.println("Server not found: " + e.getMessage());
@@ -511,5 +516,33 @@ public class Client {
         System.out.printf("\nClient :: parseData_en() :: header: 0x%x\n",header);
         return header;
 
+    }
+}
+
+class SenderThread extends Thread{
+    Socket socket=null;
+    String name;
+
+    Scanner sc=new Scanner(System.in);
+
+    public SenderThread(Socket socket, String name){
+        this.socket=socket;
+        this.name=name;
+    }
+    public void run(){
+        try{
+            PrintStream out=new PrintStream(socket.getOutputStream());
+            out.println(name);
+            out.flush();
+
+//            while(true){
+//                    String outputMsg = sc.nextLine();
+//                    out.println(outputMsg);
+//                    out.flush();
+//                    if("quit".equals(outputMsg)) break;
+//            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

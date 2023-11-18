@@ -1,5 +1,6 @@
 package Server;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -49,12 +50,15 @@ public class ClientHandler extends Thread {
     public static int IdNum = 0;
     public static int IsOK = 0;
 
+    BufferedReader in=null;
+
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
 
     public void run(){
+
         MovieReservationObject movieReservationObject = new MovieReservationObject();
         System.out.println("Server :: run()"); //FOR_DEBUG
             //clientHandlers.add(this);  // 여기서 ClientHandler 객체를 추가
