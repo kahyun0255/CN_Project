@@ -17,7 +17,7 @@ public class LoginServer {
     PreparedStatement pstmt = null;
     ResultSet resultSet = null;
 
-    public void loginServer(Socket socket) throws IOException, SQLException {
+    public void loginServer(ClientHandler clientHandler, Socket socket) throws IOException, SQLException {
         new MySqlTest().dbConnection();
 
         IsOK = 1;
@@ -41,6 +41,7 @@ public class LoginServer {
             IsOK = 1;
             sendData(socket, LOGIN | 0x4, 0);
             IsOK = 0;
+            ClientHandler.addUserId(clientHandler.getSessionID(), inputId);
         } else {
             // 결과 집합이 비어 있다면, 아이디가 존재하지 않음
             IdNum = 0;

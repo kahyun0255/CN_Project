@@ -13,6 +13,7 @@ public class MypageSever_02 {
     Scanner sc = new Scanner(System.in);
     PreparedStatement pstmt = null;
     ResultSet resultSet = null;
+
     public Object Mypage(ClientHandler clientHandler, String UserID) throws IOException {
         new MySqlTest().dbConnection();
 
@@ -20,6 +21,7 @@ public class MypageSever_02 {
 
         MyPageObject.MyPageInfo mypageinfo;
         try {
+            System.out.println("----MyPageUserid "+UserID);
             pstmt = mySqlTest.dbconn.prepareStatement(
                     "SELECT " +
                             "u.id AS userid, " +
@@ -46,8 +48,11 @@ public class MypageSever_02 {
                 userId = resultSet.getString("userid");
                 userName = resultSet.getString("username");
                 String movieName = resultSet.getString("movie_name");
+                System.out.println("---------MyPageServer movie name"+movieName);
                 String date = resultSet.getString("date");
+                System.out.println("---------MyPageServer movie date"+date);
                 String time = resultSet.getString("time");
+                System.out.println("---------MyPageServer movie time"+time);
                 String seatNumber = resultSet.getString("seat_number");
 
                 // 이 정보들을 MyPageObject.MyPageMovieInfo 객체에 담아 리스트에 추가

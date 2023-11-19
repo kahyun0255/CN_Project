@@ -57,6 +57,7 @@ public class Client {
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         LoginClient Login = new LoginClient();
+        ArrayList ClientUsers=new ArrayList<>();
 
         System.out.println("\tClient :: main()"); //FOR_DEBUG
         String hostname = "localhost";
@@ -68,7 +69,15 @@ public class Client {
 
             Client clinet = new Client(socket);
 
-            String name="user"+(int)(Math.random()*10);
+            int name;
+            while(true){
+                name=(int)(Math.random()*100000);
+                if(!ClientUsers.contains(name)){
+                    break;
+                }
+            }
+
+
             Thread sendThread = new SenderThread(socket,name);
             sendThread.start();
 
@@ -148,7 +157,17 @@ public class Client {
                     C_isOK = 0;
                 sendData(socket, RESERVATION, InfoCheck);
                 
-                receiveData(socket);
+                int reservationCheck=receiveData(socket);
+                if(reservationCheck ==0){
+                    C_isOK=0;
+                }
+                else if(reservationCheck==1){
+                    C_isOK=1;
+                }
+                else if(reservationCheck==3){
+                    System.out.println("다른 사용자가 이미 선택한 좌석입니다.");
+                    C_isOK=0;
+                }
                 
                 if(C_isOK == 1)
                     System.out.println("예매가 완료되었습니다.");
@@ -177,7 +196,7 @@ public class Client {
 
                 byte[] MovidInfoObjectData = receiveObjectData(socket);
                 MyPageObject.MyPageInfo movieInfoObject = toObject(MovidInfoObjectData, MyPageInfo.class);
-                MypageClient_02.MyPageClinet(this, movieInfoObject); //선택한 날짜
+                MypageClient_02.MyPageClinet(this, movieInfoObject);
             }
             else if(inputNum==4){
                 sendData(socket, 9,9);
@@ -449,11 +468,11 @@ public class Client {
 
 class SenderThread extends Thread{
     Socket socket=null;
-    String name;
+    int name;
 
     Scanner sc=new Scanner(System.in);
 
-    public SenderThread(Socket socket, String name){
+    public SenderThread(Socket socket, int name){
         this.socket=socket;
         this.name=name;
     }

@@ -13,10 +13,12 @@ import java.net.Socket;
 import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.sun.xml.fastinfoset.tools.FI_SAX_Or_XML_SAX_DOM_SAX_SAXEvent;
+import java.util.UUID;
 import org.example.GenreSearchObject;
 import org.example.GenreSearchObject.GenreList;
 import org.example.GenreSearchObject.GenreName;
@@ -32,6 +34,8 @@ import org.example.Pair;
 
 
 public class ClientHandler extends Thread {
+    private static int nextSessionId=1; //다음 세션 ID
+    private int sessionId; //현재 클라이언트의 세션 ID
     public Socket socket;
     private String name;
     private static Set<ClientHandler> clientHandlers = new HashSet<>();
@@ -51,12 +55,16 @@ public class ClientHandler extends Thread {
     public static int MenuNum = 0;
     public static int IdNum = 0;
     public static int IsOK = 0;
+    public static String userId=null;
+    static HashMap<Integer, String> userIdMap = new HashMap<Integer,String>();
 
     BufferedReader in=null;
 
-
     public ClientHandler(Socket socket) {
         this.socket = socket;
+        synchronized (ClientHandler.class){
+            this.sessionId=nextSessionId++; //세션 ID 할당 및 증가
+        }
     }
 
     public void run(){
@@ -74,7 +82,7 @@ public class ClientHandler extends Thread {
                 if(data == LOGIN){  //LOGIN SERVICE
                     System.out.println("\t<<로그인>>");
                     LoginServer login = new LoginServer();
-                    login.loginServer(socket);
+                    login.loginServer(this, socket);
                 }
                 else if(data == JOIN) {  //회원가입
                     System.out.println("\t<<회원가입>>");
@@ -84,45 +92,47 @@ public class ClientHandler extends Thread {
                 }
                 else if(data==MYINFO){
                     System.out.println("\t<<마이페이지>>");
+                    System.out.println("\t --사용자 아이디"+getUserId(getSessionID()));
                     MypageSever_02 myPageServer = new MypageSever_02();
 
-                    Object outputMovieInfo = myPageServer.Mypage(this,"kkh1234"); //선택한 시간 보내기
-                    sendObjectData(socket, 8, outputMovieInfo); //시트 정보 보내기
+                    Object outputMovieInfo = myPageServer.Mypage(this,getUserId(getSessionID())); //선택한 시간 보내기
+                    sendObjectData(socket, MYINFO, outputMovieInfo); //시트 정보 보내기
                 }
                 else if(data==RESERVATION){ //영화 예매
+                    String userID=getUserId(getSessionID());
                     System.out.println("\t<<영화예매>>");
                     MovieReservationServer movieReservationServer=new MovieReservationServer();
                     System.out.println("\t==>영화선택");
-                    ArrayList<Pair<Integer,String>>movieName=movieReservationServer.MovieReservationMovieName(this);
+                    ArrayList<Pair<Integer,String>>movieName=movieReservationServer.MovieReservationMovieName(this,userID);
                     MovieReservationObject.MovieName movieNameObject=new MovieReservationObject.MovieName(movieName);
                     sendObjectData(socket,5, movieNameObject);
 
                     int movieId=receiveData(socket);
-                    ArrayList movieDate=movieReservationServer.MovieReservationDate(this,movieId);
+                    ArrayList movieDate=movieReservationServer.MovieReservationDate(this,movieId,userID);
                     MovieReservationObject.MovieDate movieDateObject=new MovieReservationObject.MovieDate(movieDate);
                     sendObjectData(socket,5, movieDateObject);
                     System.out.println("\t==>날짜선택");
                     byte[] ObjectMovieDate=receiveObjectData(socket);
                     MovieReservationObject.InputMovieDate inputmovieDate=toObject(ObjectMovieDate, InputMovieDate.class);
-                    ArrayList outputTime = movieReservationServer.MovieReservationTime(this,movieId,inputmovieDate); //선택한 날짜
+                    ArrayList outputTime = movieReservationServer.MovieReservationTime(this,movieId,inputmovieDate,userID); //선택한 날짜
                     MovieReservationObject.MovieTime inputMovieTimeObject=new MovieReservationObject.MovieTime(outputTime); //오브젝트 형태로 변환 후 전송
                     sendObjectData(socket, 5, inputMovieTimeObject);
                     System.out.println("\t==>시간선택");
                     byte[] ObjectMovieTime=receiveObjectData(socket);
                     MovieReservationObject.InputMovieTime inputmovieTime=toObject(ObjectMovieTime, InputMovieTime.class);
-                    ArrayList<Pair<String, Boolean>> outputSeat = movieReservationServer.MovieReservationSeatCheck(this,movieId,inputmovieDate, inputmovieTime); //선택한 시간 보내기
+                    ArrayList<Pair<String, Boolean>> outputSeat = movieReservationServer.MovieReservationSeatCheck(this,movieId,inputmovieDate, inputmovieTime,userID); //선택한 시간 보내기
                     MovieReservationObject.MovieSeat outputMovieSeatObject=new MovieReservationObject.MovieSeat(outputSeat); //오브젝트 형태로 변환 후 전송
                     sendObjectData(socket, 5, outputMovieSeatObject); //시트 정보 보내기
                     System.out.println("\t==>좌석선택");
                     byte[] ObjectMovieSeatNum=receiveObjectData(socket);
                     MovieReservationObject.MovieSeatNum inputmovieSeatNum=toObject(ObjectMovieSeatNum, MovieSeatNum.class);
-                    Object outputMovieInfo = movieReservationServer.MovieReservationInfo(this,movieId,inputmovieDate, inputmovieTime, inputmovieSeatNum); //선택한 시간 보내기
+                    Object outputMovieInfo = movieReservationServer.MovieReservationInfo(this,movieId,inputmovieDate, inputmovieTime, inputmovieSeatNum,userID); //선택한 시간 보내기
                     sendObjectData(socket, 5, outputMovieInfo); //시트 정보 보내기
                     System.out.println("\t==>정보확인");
                     int infoCheck=receiveData(socket);
-                    movieReservationServer.MovieReservation(this,movieId,inputmovieDate, inputmovieTime, inputmovieSeatNum, infoCheck);
-                    IsOK = 1;
-                    sendData(socket, 5, 0); //예매확인
+                    int reservationCheck = movieReservationServer.MovieReservation(this,movieId,inputmovieDate, inputmovieTime, inputmovieSeatNum, infoCheck, userID);
+                    IsOK = 1; //이거 다시해야할듯요 reservationCheck가 1이면 예매 된거고 0 혹은 3이면 예매 안된걸루
+                    sendData(socket, 5, reservationCheck); //예매확인
                 }
                 else if(data==GENRE){
                     System.out.println("\t<<장르검색>>");
@@ -153,6 +163,18 @@ public class ClientHandler extends Thread {
             disconnect();
         }
     }
+    public int getSessionID(){
+        return sessionId;
+    }
+
+    public static synchronized void addUserId(int sessionId, String userId) {
+        userIdMap.put(sessionId, userId);
+    }
+
+    public static synchronized String getUserId(int sessionId) {
+        return userIdMap.get(sessionId);
+    }
+
     public static void sendObjectData(Socket socket, int menuNum,Object obj) throws IOException {
         System.out.println("\tServer :: sendObjectData() ::");   //FOR DEBUG
 
@@ -402,9 +424,7 @@ public class ClientHandler extends Thread {
     }
     private void disconnect() { //----- == 로그아웃
         System.out.println("\nServer :: disconnect()"); //FOR_DEBUG
-        if (name != null) {
-            clientHandlers.remove(this);
-        }
+        clientHandlers.remove(this);
         try {
             socket.close();
         } catch (IOException e) {

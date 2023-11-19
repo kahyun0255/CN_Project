@@ -20,7 +20,7 @@ public class Server extends Thread{
     Socket socket;
     static BufferedReader in=null;
     PrintWriter out=null;
-    static String name="";
+    static int name;
     public Server(Socket socket) throws IOException {
         this.socket=socket;
         try{
@@ -44,13 +44,10 @@ public class Server extends Thread{
                 System.out.println("New client connected");
                 // Handle the client in a separate thread
                 Thread serverThread = new Server(socket);
-                name=in.readLine();
-                System.out.println("------user 들어옴"+name+"-----");
+                name=in.read();
+                System.out.println("------user 들어옴 "+name+"-----");
                 System.out.println(users.size());
                 new ClientHandler(socket).start();
-
-                //시작되면 서버가 로그인 되어있는지 확인 메세지 보내 -> 네 알겟더요.
-
             }
         } catch (IOException e) {
             System.out.println("Server exception: " + e.getMessage());
