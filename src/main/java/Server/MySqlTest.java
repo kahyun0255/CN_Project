@@ -29,4 +29,13 @@ public class MySqlTest {
             e.printStackTrace();
         }
     }
+    public void closeConnection() {
+        try {
+            if (dbconn != null && !dbconn.isClosed()) {
+                dbconn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

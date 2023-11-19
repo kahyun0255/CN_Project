@@ -1,34 +1,44 @@
 package Client;
 
+import org.example.Join;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
+import static Client.Client.*;
+import static Client.Client.C_isOK;
+
 public class JoinClient {
-    public static void run(Socket mainSocket) {
-        try {
-            Scanner scanner = new Scanner(System.in);
+    Client client = new Client(new Socket());
 
+    public static void joinPage(Socket socket) throws IOException {
+        Scanner sc = new Scanner(System.in);
+        //System.out.println("회원가입 페이지 입니다.");
+
+        sendData(socket, JOIN, 2);
+
+        receiveData(socket);
+        if (C_isOK == 1) {
             System.out.print("아이디: ");
-            String id = scanner.nextLine();
-
+            String id = sc.next();
             System.out.print("이름: ");
-            String name = scanner.nextLine();
-
+            String name = sc.next();
             System.out.print("비밀번호: ");
-            String password = scanner.nextLine();
+            String pw = sc.next();
+            C_isOK = 0;
 
-            // 회원가입 정보를 객체 또는 문자열로 만들어서 메인 소켓 클라이언트를 통해 메인 소켓 서버로 전송
-            String signUpData = id + "," + name + "," + password;
-            ObjectOutputStream oos = new ObjectOutputStream(mainSocket.getOutputStream());
-            oos.writeUTF(signUpData);
-            oos.flush();
+            Join.JoinInfo joinInfo = new Join.JoinInfo(id, name, pw);
 
-            System.out.println("회원가입이 완료되었습니다.");
+            sendObjectData(socket, JOIN, joinInfo);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            receiveData(socket);
+            if (C_isOK == 1) {
+                System.out.println("회원가입이 완료되었습니다.");
+                C_isOK = 0; //변수 초기화
+
+            }
         }
     }
 }

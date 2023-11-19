@@ -1,6 +1,7 @@
 package Client;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -11,10 +12,8 @@ import org.example.Pair;
 public class MovieReservationClient {
     MovieReservationObject movieReservationObject = new MovieReservationObject();
     Scanner sc = new Scanner(System.in);
-    String Protocol = "0x000001101";
 
     int MovieReservationMovieName(Client client, MovieReservationObject.MovieName movieNameArray) {
-        System.out.println("영화 번호를 입력해주세요.");
         int MovieId;
 
         for (Pair<Integer, String> pair : movieNameArray.movieNumArray) {
@@ -24,6 +23,7 @@ public class MovieReservationClient {
         }
         while (true) {
             try{
+                System.out.printf("영화 번호를 입력해주세요: ");
                 MovieId = sc.nextInt();
                 boolean movieIdExists = false;
 
@@ -47,13 +47,13 @@ public class MovieReservationClient {
         return MovieId;
     }
     String MovieReservationDate(Client client, MovieReservationObject.MovieDate dateArray) {
-        System.out.println("날짜를 입력해주세요.");
 //        ArrayList dateArray = new ArrayList<>(); //나중에 바꾸기 -> 서버에서 받아온 ArrayList로
         for (Object date : dateArray.dateArray) {
             System.out.println(date);
         }
         String Date;
         while (true) {
+            System.out.printf("날짜를 입력해주세요: ");
             Date = sc.next();
             if (!IsMatch.isMatch(Date, "????-??-??")) {
                 System.out.println("입력 형태가 잘못되었습니다. ????-??-?? 형태로 입력해주세요.");
@@ -69,7 +69,6 @@ public class MovieReservationClient {
     }
 
     String MovieReservationTime(Client client, MovieReservationObject.MovieTime timeArray) {
-        System.out.println("시간을 입력해주세요.");
 
 //        ArrayList timeArray = new ArrayList<>(); //아 ArrayList로 빼놧구나 하나면 ArrayList로 안해두 될듯?
         for (Object date : timeArray.timeArray) {
@@ -77,6 +76,7 @@ public class MovieReservationClient {
         }
         String Time;
         while (true) {
+            System.out.printf("시간을 입력해주세요: ");
             Time = sc.next();
             if (!IsMatch.isMatch(Time, "??:??")) {
                 System.out.println("입력 형태가 잘못되었습니다. ??:?? 형태로 입력해주세요.");
@@ -92,7 +92,7 @@ public class MovieReservationClient {
     }
 
     ArrayList MovieReservationSeat(Client client, MovieReservationObject.MovieSeat seatArray) {
-        System.out.println("인원을 입력해주세요.(숫자만 입력해주세요.)");
+        System.out.printf("인원을 입력해주세요.(숫자만 입력해주세요.): ");
         int PeopleNum = sc.nextInt();
 
 //        List<Pair<String, Boolean>> seatArray = new ArrayList<>();
@@ -121,7 +121,7 @@ public class MovieReservationClient {
         ArrayList seatNum = new ArrayList<String>(); //이거 서버로 보내야함
         int cnt = 0;
         while (cnt < PeopleNum) {
-            System.out.println("좌석을 하나씩 입력해주세요(예: A-3):");
+            System.out.printf("좌석을 하나씩 입력해주세요(예: A-3):");
             String SeatNum = sc.next();
             seatNum.add(SeatNum);
             cnt++;
@@ -140,15 +140,15 @@ public class MovieReservationClient {
         }
 
         System.out.println(); //여기두 주석처리 ㄷ다~~~빼기 까먹고 지우면 큰일남~~ 큰일까지는 아니겟군아;;
-        System.out.println("정보가 맞는지 확인해주세요. 맞으면 예, 틀리면 아니오를 입력해주세요.");
+        System.out.printf("정보가 맞는지 확인해주세요(Y/N): ");
 
         int infoCheck = 0; //나중에 싹~~~지우기 확인용 다시 하기(OK / No 사인 받고 하기~~)
         while (infoCheck == 0) {
             String str = sc.next();
-            if (str.equals("예")) {
+            if (str.equals("Y")) {
                 infoCheck = 1;
                 break;
-            } else if (str.equals("아니오")) {
+            } else if (str.equals("N")) {
                 infoCheck = 2;
                 break;
                 // 처음부터 다시 입력받기...

@@ -12,7 +12,7 @@ public class Login {
         public LoginInfo(String id, String pw){
             this.id = id;
             this.pw = pw;
-            System.out.println("Login Info: ID: " + this.id + " PW: " + this.pw);
+            //System.out.println("Login Info: ID: " + this.id + " PW: " + this.pw);
         }
     }
 

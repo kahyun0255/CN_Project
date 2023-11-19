@@ -127,6 +127,7 @@ public class MovieReservationServer {
             for (Object s : seatNum.seatNumArray) { //나중에 지우기 -> 향샹된 for문이 아닌 그냥 for문으로해서 마지막 콤마 제거하기
                 System.out.print(s + ", ");
             }
+            System.out.println(" ");
         }
         MovieReservationObject.MovieInfo movieInfo = new MovieReservationObject.MovieInfo(DBmovieName, Date.inputDate, Time.inputTime, seatNum.seatNumArray);
         return movieInfo;
@@ -141,8 +142,8 @@ public class MovieReservationServer {
                 pstmt = mySqlTest.dbconn.prepareStatement(
                         "UPDATE seat SET `check` = true WHERE movieid = ? AND date = ? AND time = ? AND number = ?"
                 );
-                System.out.println("MovieId : " + MovieId + " Date : " + Date + " Time : " + Time + " nowSeatNum : "
-                        + nowSeatNum); //나중에 지우기 -> 확인용임...
+//                System.out.println("MovieId : " + MovieId + " Date : " + Date + " Time : " + Time + " nowSeatNum : "
+//                        + nowSeatNum); //나중에 지우기 -> 확인용임...
                 pstmt.setInt(1, MovieId);
                 pstmt.setString(2, Date.inputDate);
                 pstmt.setString(3, Time.inputTime);

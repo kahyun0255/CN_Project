@@ -57,13 +57,14 @@ public class Client {
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         LoginClient Login = new LoginClient();
-        System.out.println("Client :: main()"); //FOR_DEBUG
+
+        System.out.println("\tClient :: main()"); //FOR_DEBUG
         String hostname = "localhost";
         int port = 7778;
 
         try {
             Socket socket=new Socket(hostname, port);
-            System.out.println("Connected to Server");
+            System.out.println("\tConnected to Server");
 
             Client clinet = new Client(socket);
 
@@ -71,9 +72,9 @@ public class Client {
             Thread sendThread = new SenderThread(socket,name);
             sendThread.start();
 
-            //Login.loginPage(socket);
-            clinet.loadMainMenu(socket);
-            //로그인 구현되면 로그인 먼저 호출
+            int loginCheck = Login.loginPage(socket);
+            if(loginCheck == 1)
+                clinet.loadMainMenu(socket);
 
         } catch (UnknownHostException e) {
             System.out.println("Server not found: " + e.getMessage());
@@ -82,104 +83,20 @@ public class Client {
         }
     }
 
-//    public void loginPage(Socket socket) throws IOException {
-//
-//        System.out.println("\nClient :: loginPage()"); //FOR_DEBUG
-//        sc = new Scanner(System.in);
-//
-//        int menuNum = 0;
-//
-//        System.out.println("1. 로그인");
-//        System.out.println("2. 회원가입");
-//        System.out.print("입력하세요: ");
-//
-//        //입력값 체크
-//        while(true){
-//            menuNum=sc.nextInt();
-//            if(menuNum>2){
-//                System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
-//            }
-//            else{
-//                break;
-//            }
-//        }
-//
-//        if(menuNum==1) {
-//            //서버에 로그인 정보가 갈꺼라고 send
-//            sendData(socket, LOGIN, 1);
-//    public void loginPage(Socket socket) throws IOException {
-//
-//        System.out.println("\nClient :: loginPage()"); //FOR_DEBUG
-//        sc = new Scanner(System.in);
-//
-//        int menuNum = 0;
-//
-//        System.out.println("1. 로그인");
-//        System.out.println("2. 회원가입");
-//        System.out.print("입력하세요: ");
-//
-//        //입력값 체크
-//        while(true){
-//            menuNum=sc.nextInt();
-//            if(menuNum>2){
-//                System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
-//            }
-//            else{
-//                break;
-//            }
-//        }
-//
-//        if(menuNum==1) {
-//            //서버에 로그인 정보가 갈꺼라고 send
-//            sendData(socket, LOGIN, 1);
-//
-//            }
-//        }
-//        else if(menuNum==2) {
-//            System.out.println("회원가입 페이지 입니다.");
-//
-//            sendData(socket,JOIN,2);
-//
-//            receiveData(socket);
-//            if(C_isOK == 1){
-//                System.out.print("이름: ");
-//                String j_name = sc.next();
-//                System.out.print("아이디: ");
-//                String j_id = sc.next();
-//                System.out.print("비밀번호: ");
-//                String j_pw = sc.next();
-//                C_isOK = 0;
-//
-//                Join.JoinInfo joinInfo = new Join.JoinInfo(j_name, j_id, j_pw);
-//
-//                sendObjectData(socket,JOIN,joinInfo);
-//                System.out.println("2\n");
-//
-//                receiveData(socket);
-//                if(C_isOK == 1){
-//                    System.out.println("회원가입이 완료되었습니다.");
-//                    C_isOK = 0; //변수 초기화
-//                    loginPage(socket);
-//                 }
-//            }
-//        }
-//
-//
-//
-//    }
 
     public void loadMainMenu(Socket socket) throws IOException{
         int inputNum;
 
-        System.out.println("\nClient :: loadMainMenu()"); //FOR_DEBUG
+        System.out.println("\tClient :: loadMainMenu()"); //FOR_DEBUG
 
         //숫자 말고 다른게 들어올 때 처리
         while(true){
+            System.out.println(" ");
             System.out.println("1. 영화 예매");
-            System.out.println("2. 영화 추천");
+            System.out.println("2. 장르 검색");
             System.out.println("3. 예매 확인");
             System.out.println("4. 로그아웃");
-
+            System.out.print("입력하세요: ");
             while(true) {
                 inputNum = sc.nextInt();
                 if(inputNum<0 || inputNum>4){
@@ -225,7 +142,21 @@ public class Client {
                 byte[] InfoObjectData = receiveObjectData(socket);
                 MovieReservationObject.MovieInfo movieInfo = toObject(InfoObjectData, MovieReservationObject.MovieInfo.class);
                 int InfoCheck = movieReservationClient.MovieReservationInfo(this, movieInfo);
+                if(InfoCheck == 1)
+                    C_isOK = 1;
+                else
+                    C_isOK = 0;
                 sendData(socket, RESERVATION, InfoCheck);
+                
+                receiveData(socket);
+                
+                if(C_isOK == 1)
+                    System.out.println("예매가 완료되었습니다.");
+                else
+                    System.out.println("예매가 취소되었습니다. 다시 시도해주세요");
+
+                C_isOK = 0;
+
             }
             else if(inputNum==2){
                 GenreSearchClient genreSearchClient = new GenreSearchClient();
@@ -258,7 +189,7 @@ public class Client {
 
     //send Object
     public static void sendObjectData(Socket socket, int menuNum,Object obj) throws IOException {
-        System.out.println("\nClient :: sendObjectData() ::");   //FOR DEBUG
+        System.out.println("\tClient :: sendObjectData() ::");   //FOR DEBUG
 
         C_dataType=1;
         C_isData=1;
@@ -272,7 +203,7 @@ public class Client {
 
         int header=0;
         header = parseData_en(menuNum);
-        System.out.printf("header: 0x%x\n",header);
+        //System.out.printf("header: 0x%x\n",header);
         byte[] headerArr = new byte[2];
 
         headerArr[0] = (byte) (header >> 8);       // 상위 8비트
@@ -281,13 +212,13 @@ public class Client {
         System.arraycopy(headerArr,0, dataWithHeader,0, headerArr.length);
         System.arraycopy(objectData,0, dataWithHeader,headerArr.length, objectData.length);
 
-        System.out.printf("[0]: 0x%x, [1]: 0x%x\n",dataWithHeader[0],dataWithHeader[1]);
+        //System.out.printf("[0]: 0x%x, [1]: 0x%x\n",dataWithHeader[0],dataWithHeader[1]);
 
 //        for(int i = 0; i < 2 + objectData.length;i++)
 //        {
 //            System.out.printf("dataWithHeader[%d]: 0x%x\n",i, dataWithHeader[i]);
 //        }
-        System.out.printf("dataWithHeader data size: 0x%x\n",dataWithHeader.length); // 객체 사이즈 출력
+        System.out.printf("\tdataWithHeader data size: 0x%x\n",dataWithHeader.length); // 객체 사이즈 출력
 
         //서버로 내보내기 위한 출력 스트림 뚫음
         OutputStream os = socket.getOutputStream();
@@ -296,12 +227,13 @@ public class Client {
         os.write(dataWithHeader);
         //보냄
         os.flush();
+        C_isOK = 0;
     }
 
     ////////ToByteArray////////////
     public static byte[] toByteArray (Object obj)
     {
-        System.out.println("Client :: toByteArray() ::");   //FOR DEBUG
+        //System.out.println("Client :: toByteArray() ::");   //FOR DEBUG
         byte[] bytes = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -319,7 +251,7 @@ public class Client {
     }
     ///////////RECEIVE/////////////////
     public static byte[] receiveObjectData(Socket socket) throws IOException {
-        System.out.println("\nClient :: receiveObject() ::");   //FOR DEBUG
+        System.out.println("\tClient :: receiveObject() ::");   //FOR DEBUG
         //수신 버퍼의 최대 사이즈 지정
         int maxBufferSize = 2048; //1024
         //버퍼 생성
@@ -328,22 +260,22 @@ public class Client {
         InputStream is = socket.getInputStream();
         //버퍼(recvBuffer) 인자로 넣어서 받음. 반환 값은 받아온 size
         int nReadSize = is.read(recvBuffer);
-        System.out.printf("@@nReadSize: 0x%x\n",nReadSize);
-        System.out.println("+++++++RecvData 내부 +++++++");
+        //System.out.printf("@@nReadSize: 0x%x\n",nReadSize);
+        //System.out.println("+++++++RecvData 내부 +++++++");
 //        for(int i = 0; i < nReadSize; i++)
 //        {
 //            System.out.printf("recvB[%d]: 0x%x\n",i, recvBuffer[i]);
 //        }
         // 헤더 추출
         int header = ((recvBuffer[0] & 0xFF) << 8) | (recvBuffer[1] & 0xFF);
-        System.out.printf("buffer[0]: 0x%x, buffer[1]: 0x%x\n", recvBuffer[0],recvBuffer[1]);
+        //System.out.printf("buffer[0]: 0x%x, buffer[1]: 0x%x\n", recvBuffer[0],recvBuffer[1]);
         //System.out.printf("Header: 0x%x\n", header);
         parseData_de(2,header);
         // 나머지 데이터 복사
         byte[] objectData = new byte[nReadSize - 2];
         System.arraycopy(recvBuffer, 2, objectData, 0, nReadSize - 2);
 
-        System.out.printf("##objectData: 0x%x\n",objectData.length);
+        //System.out.printf("##objectData: 0x%x\n",objectData.length);
 //        for(int i = 0; i < objectData.length; i++)
 //        {
 //            System.out.printf("objD[%d]: 0x%x\n",i, objectData[i]);
@@ -366,25 +298,21 @@ public class Client {
     ////ToObject()/////////////////
     public static <T> T toObject (byte[] bytes, Class<T> type)
     {
-        System.out.println("Client :: toObject() ::");   //FOR DEBUG
+        //System.out.println("Client :: toObject() ::");   //FOR DEBUG
         Object obj = null;
-        System.out.println("@@@@@@@");
         try {
             ByteArrayInputStream bis = new ByteArrayInputStream (bytes);
             ObjectInputStream ois = new ObjectInputStream (bis);
             obj = ois.readObject();
-            System.out.println("Received object type: " + obj.getClass().getName());
-            System.out.println("!!!!!!!!");
+            //System.out.println("Received object type: " + obj.getClass().getName());
         }
         catch (IOException ex) {
             //TODO: Handle the exception
-            System.out.println("$$$$$$$$");
             System.out.println("IOException: " + ex.getMessage());
             ex.printStackTrace(); // 이 부분을 추가하여 오류의 상세 내용을 출력
         }
         catch (ClassNotFoundException ex) {
             //TODO: Handle the exception
-            System.out.println("&&&&&&&");
         }
 
         return type.cast(obj);
@@ -392,7 +320,7 @@ public class Client {
 
     //send Byte
     public static void sendData(Socket socket,int menuNum,int data)throws IOException{
-        System.out.println("\nClient :: sendData() ::");   //FOR DEBUG
+        System.out.println("\tClient :: sendData() ::");   //FOR DEBUG
 
         OutputStream os = socket.getOutputStream();
 
@@ -408,7 +336,7 @@ public class Client {
 
         data |= header;
 
-        System.out.printf("Senddata: 0x%x\n",data);
+        System.out.printf("\tSendData: 0x%x\n",data);
         // 4바이트 크기의 버퍼를 생성합니다.
         byte[] buffer = new byte[4];
 
@@ -420,9 +348,10 @@ public class Client {
         // 바이트 배열을 스트림을 통해 전송합니다.
         os.write(buffer);
         os.flush(); // 버퍼에 남아있는 데이터를 모두 전송합니다.
+        C_isOK = 0;
     }
     public static int receiveData(Socket socket) throws IOException{
-        System.out.println("\nSever:: receiveData() ::");
+        System.out.println("\tClient:: receiveData() ::");
         //서버 통신
         InputStream is = socket.getInputStream();
 
@@ -452,31 +381,30 @@ public class Client {
                 (buffer[2] << 8)  & 0x0000ff00 |
                 (buffer[3])       & 0x000000ff;
 
-        System.out.printf("Received integer: 0x%x\n",value);
+        System.out.printf("\tReceived integer: 0x%x\n",value);
 
         int recvData = parseData_de(1,value);
-        System.out.printf("recvData: 0x%x\n",recvData);
+        //System.out.printf("recvData: 0x%x\n",recvData);
         return recvData;
 
     }
 
     static int parseData_de(int DataType, int value)
     {
-        System.out.println("\nClient :: parseData_de() ::");
+        System.out.printf("\tClient :: parseData_de() ::");
         //dataType = 1 => 헤더, 데이터 모두 전달
         //dataType = 2 => 헤더 값만 전달
         short header = 0;
         int data = 0;
 
         if(DataType == 1) {
-            System.out.println("dataType 1\n");
             header = (short)(value >> 16) ;
             data = value & 0xFF;
         }
         else if(DataType == 2){
             header = (short)value;
         }
-        System.out.printf("h: 0x%x, d: 0x%x\n",header, data);
+        System.out.printf(" h: 0x%x, d: 0x%x\n",header, data);
 
         C_networkType = (header >> 15) & 0x01;
         C_isError = (header >> 14) & 0x01;
@@ -487,7 +415,7 @@ public class Client {
         C_idNum = (header >> 1)& 0x1F;
         C_isOK = header & 0x1;
 
-        System.out.printf("nt: %x, iE: %x, eC: %x, iD: %x, dT: %x, mN: %x, iN: %x, iO:%x\n"
+        System.out.printf("\tnt: %x, iE: %x, eC: %x, iD: %x, dT: %x, mN: %x, iN: %x, iO:%x\n"
                 ,C_networkType,C_isError,C_errorCode,C_isData
                 ,C_dataType,C_menuNum,C_idNum,C_isOK);
         if(DataType == 1) {
@@ -513,7 +441,7 @@ public class Client {
                 ((C_errorCode << 11) & 0x3800)|((C_isData << 10) & 0x600)|
                 ((C_dataType << 9) & 0x200)|((C_menuNum << 6) & 0x1C0)|
                 ((C_idNum << 1) & 0x3E)|(C_isOK  & 0x1));
-        System.out.printf("\nClient :: parseData_en() :: header: 0x%x\n",header);
+        System.out.printf("\tClient :: parseData_en() :: header: 0x%x\n",header);
         return header;
 
     }

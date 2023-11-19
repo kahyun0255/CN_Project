@@ -1,4 +1,6 @@
 package Server;// SignUpServer.java
+import org.example.Join;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -7,48 +9,50 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static Server.ClientHandler.*;
+import static Server.ClientHandler.JOIN;
+
 public class JoinServer {
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dbplus";
-    private static final String JDBC_USER = "root";
-    private static final String JDBC_PASSWORD = "1234";
+    MySqlTest mySqlTest = new MySqlTest();
+    PreparedStatement pstmt = null;
+    public void joinServer(Socket socket) throws IOException, SQLException {
 
-    public static void processSignUpData(Socket clientSocket) {
-        try {
-            // 회원가입 정보를 받음
-            ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-            String signUpData = ois.readUTF();
+        new MySqlTest().dbConnection();
 
-            // 회원가입 정보를 적절히 처리
-            String[] signUpArray = signUpData.split(",");
-            String id = signUpArray[0];
-            String name = signUpArray[1];
-            String password = signUpArray[2];
+        //DB에서 데이터 받아옴
+        IsOK = 1;
+        sendData(socket,JOIN,0);
+        byte[] joinObjectData = receiveObjectData(socket);
+        Join.JoinInfo joinInfo = toObject(joinObjectData, Join.JoinInfo.class);
 
-            // 데이터베이스에 연결
-            Connection connection = getConnection();
+        String id = joinInfo.id;
+        String name = joinInfo.name;
+        String password = joinInfo.pw;
+        //받은 정보 DB에 저장
+        // 데이터베이스에 연결
+        String sql = "INSERT INTO userinfo (id, name, password) VALUES (?, ?, ?)";
+        pstmt = mySqlTest.dbconn.prepareStatement(sql);
+        pstmt.setString(1, id);
+        pstmt.setString(2, name);
+        pstmt.setString(3, password);
+        int affectedRows = pstmt.executeUpdate();
 
-            // 데이터베이스에 회원가입 정보 입력
-            String sql = "INSERT INTO userinfo (id, name, password) VALUES (?, ?, ?)";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                preparedStatement.setString(1, id);
-                preparedStatement.setString(2, name);
-                preparedStatement.setString( 3, password);
-                preparedStatement.executeUpdate();
-            }
-
+        if (affectedRows > 0) {
             System.out.println("회원가입 정보를 데이터베이스에 저장했습니다.");
-
-        } catch (IOException | SQLException e) {
-            e.printStackTrace();
+            // 성공 메시지 전송 로직 (생략)
+            //저장완료되면 ok 사인 보내기
+            IsOK = 1;
+            sendData(socket,JOIN,0);
+        } else {
+            System.out.println("데이터 저장 실패.");
+            // 실패 메시지 전송 로직 (생략)
         }
-    }
 
-    private static Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+        // PreparedStatement와 연결 닫기
+        if (pstmt != null)
+            pstmt.close();
+        mySqlTest.closeConnection(); // 데이터베이스 연결 닫기
+
+
     }
 }

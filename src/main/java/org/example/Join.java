@@ -5,13 +5,13 @@ public class Join {
     public static Join JoinInfo;
 
     public static class JoinInfo implements Serializable {
-        String name;
-        String id;
-        String pw;
+        public String name;
+        public String id;
+        public String pw;
 
-        public JoinInfo(String name, String id, String pw){
-            this.name = name;
+        public JoinInfo(String id,String name,  String pw){
             this.id = id;
+            this.name = name;
             this.pw = pw;
             //System.out.println("Join Info(name: " + this.name +
             //       "id: " + this.id  + "pw: " + this.pw);

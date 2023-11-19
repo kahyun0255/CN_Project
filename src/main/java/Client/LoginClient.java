@@ -14,7 +14,7 @@ public class LoginClient{
     Scanner sc = new Scanner(System.in);
     public int loginPage(Socket socket) throws IOException {
 
-        System.out.println("\nClient :: loginPage()"); //FOR_DEBUG
+        System.out.println("\tClient :: loginPage()"); //FOR_DEBUG
         sc = new Scanner(System.in);
 
         int menuNum = 0;
@@ -36,12 +36,14 @@ public class LoginClient{
 
             if (menuNum == 1) {
                 //서버에 로그인 정보가 갈꺼라고 send
+                System.out.println("\t로그인 페이지");
                 sendData(socket, LOGIN, 1);
 
                 //receive
                 int data = receiveData(socket);
                 if (C_isOK == 1) {
                     //서버에서 알겠다고 ok 오면 send
+                    System.out.println(" ");
                     System.out.print("아이디: ");
                     String id = sc.next();
                     System.out.print("비밀번호: ");
@@ -53,42 +55,22 @@ public class LoginClient{
 
                     receiveData(socket);
                     final int idNum = C_idNum;
-                    System.out.printf("idNum: %d\n", idNum);
+                    System.out.printf("\tidNum: %d\n", idNum);
                     if (C_isOK == 1) {
                         System.out.println("로그인에 성공하셨습니다");
+                        C_isOK = 0;
                         return 1;
                     } else {
                         System.out.println("로그인에 실패하셨습니다");
+                        C_isOK = 0;
                     }
-                    C_isOK = 0;
+
 
                 }
             } else if (menuNum == 2) {
-                System.out.println("회원가입 페이지 입니다.");
-
-                sendData(socket, JOIN, 2);
-
-                receiveData(socket);
-                if (C_isOK == 1) {
-                    System.out.print("이름: ");
-                    String j_name = sc.next();
-                    System.out.print("아이디: ");
-                    String j_id = sc.next();
-                    System.out.print("비밀번호: ");
-                    String j_pw = sc.next();
-                    C_isOK = 0;
-
-                    Join.JoinInfo joinInfo = new Join.JoinInfo(j_name, j_id, j_pw);
-
-                    sendObjectData(socket, JOIN, joinInfo);
-                    System.out.println("2\n");
-
-                    receiveData(socket);
-                    if (C_isOK == 1) {
-                        System.out.println("회원가입이 완료되었습니다.");
-                        C_isOK = 0; //변수 초기화
-                    }
-                }
+                System.out.println("\t회원가입 페이지");
+                JoinClient join = new JoinClient();
+                JoinClient.joinPage(socket);
             }
 
 
