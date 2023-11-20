@@ -34,9 +34,9 @@ public class GenreSearchClient {
             if (isValid) {
                 // 유효한 번호인 경우
                 for (Pair<Integer, String> genre : GenreList.genreList) {
-                    if (genre.first == selectedGenreNumber) {
+                    if (genre.first.equals(selectedGenreNumber)) {
                         System.out.println("선택한 장르: " + genre.second);
-                        return GenreList.genreList.get(selectedGenreNumber).second;
+                        return GenreList.genreList.get(selectedGenreNumber-1).second;
                     }
                 }
             } else {
