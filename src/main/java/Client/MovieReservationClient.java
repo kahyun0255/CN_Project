@@ -14,7 +14,7 @@ public class MovieReservationClient {
     Scanner sc = new Scanner(System.in);
 
     int MovieReservationMovieName(Client client, MovieReservationObject.MovieName movieNameArray) {
-        int MovieId;
+        int MovieId=0;
 
         for (Pair<Integer, String> pair : movieNameArray.movieNumArray) {
             int movieId = pair.first;
@@ -22,26 +22,25 @@ public class MovieReservationClient {
             System.out.println(movieId + ", " + movieName);
         }
         while (true) {
-            try{
-                System.out.printf("영화 번호를 입력해주세요: ");
+            System.out.printf("영화 번호를 입력해주세요: ");
+            try {
                 MovieId = sc.nextInt();
-                boolean movieIdExists = false;
-
-                for (Pair<Integer, String> pair : movieNameArray.movieNumArray) {
-                    if (pair.first.equals(MovieId)) {
-                        movieIdExists = true;
-                        break; // 일치하는 영화 ID를 찾았으므로 더 이상 반복할 필요가 없음
-                    }
-                }
-
-                if (!movieIdExists) {
-                    System.out.println("입력하신 번호의 영화가 존재하지 않습니다. 영화 번호를 다시 입력해주세요.");
-                } else {
-                    break;
-                }
             }catch (InputMismatchException e) {
                 System.out.println("숫자를 입력해야 합니다. 다시 시도해주세요.");
                 sc.next(); // 입력 버퍼 초기화
+            }
+            boolean movieIdExists = false;
+
+            for (Pair<Integer, String> pair : movieNameArray.movieNumArray) {
+                if (pair.first.equals(MovieId)) {
+                    movieIdExists = true;
+                    break; // 일치하는 영화 ID를 찾았으므로 더 이상 반복할 필요가 없음
+                }
+            }
+            if (!movieIdExists) {
+                System.out.println("입력하신 번호의 영화가 존재하지 않습니다. 영화 번호를 다시 입력해주세요.");
+            } else {
+                break;
             }
         }
         return MovieId;
@@ -93,7 +92,21 @@ public class MovieReservationClient {
 
     ArrayList MovieReservationSeat(Client client, MovieReservationObject.MovieSeat seatArray) {
         System.out.printf("인원을 입력해주세요.(숫자만 입력해주세요.): ");
-        int PeopleNum = sc.nextInt();
+        int PeopleNum=0;
+        while(true){
+            try {
+                PeopleNum = sc.nextInt();
+            }catch (InputMismatchException e) {
+                System.out.println("숫자를 입력해야 합니다. 다시 시도해주세요.");
+                sc.next(); // 입력 버퍼 초기화
+            }
+            if(PeopleNum==0){
+                System.out.println("최소 1명의 인원을 입력해주세요");
+            }else{
+                break;
+            }
+
+        }
 
 //        List<Pair<String, Boolean>> seatArray = new ArrayList<>();
 

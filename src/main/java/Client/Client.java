@@ -6,29 +6,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-//import org.example.GenreSearchObject;
-//import org.example.GenreSearchObject.GenreList;
-//import org.example.GenreSearchObject.GenreMovieName;
-//import org.example.Login;
-//import org.example.MovieReservationObject;
-//import org.example.MovieReservationObject.MovieDate;
-//import org.example.MovieReservationObject.MovieInfo;
-//import org.example.MovieReservationObject.MovieName;
-//import org.example.MovieReservationObject.MovieSeat;
-//import org.example.MovieReservationObject.MovieSeatNum;
-//import org.example.MovieReservationObject.MovieTime;
-//import org.example.MyPageObject;
-//import org.example.MyPageObject.MyPageInfo;
-//import org.example.Pair;
 
 import org.example.*;
 import org.example.GenreSearchObject.GenreList;
 import org.example.GenreSearchObject.GenreMovieName;
-import org.example.MovieReservationObject.MovieDate;
-import org.example.MovieReservationObject.MovieInfo;
-import org.example.MovieReservationObject.MovieName;
-import org.example.MovieReservationObject.MovieSeat;
-import org.example.MovieReservationObject.MovieTime;
 import org.example.MyPageObject.MyPageInfo;
 
 public class Client {
@@ -94,7 +75,7 @@ public class Client {
 
 
     public void loadMainMenu(Socket socket) throws IOException{
-        int inputNum;
+        int inputNum = 0;
 
         System.out.println("\tClient :: loadMainMenu()"); //FOR_DEBUG
 
@@ -107,7 +88,12 @@ public class Client {
             System.out.println("4. 로그아웃");
             System.out.print("입력하세요: ");
             while(true) {
-                inputNum = sc.nextInt();
+                try {
+                    inputNum = sc.nextInt();
+                } catch (InputMismatchException e) {
+                    System.out.println("숫자를 입력해야 합니다. 다시 시도해주세요.");
+                    sc.next(); // 입력 버퍼 초기화
+                }
                 if(inputNum<0 || inputNum>4){
                     System.out.println("잘못 입력하셨습니다. 다시 입력해주세요");
                 }

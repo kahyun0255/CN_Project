@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import Server.GenreSearchServer;
@@ -21,7 +22,12 @@ public class GenreSearchClient {
         int selectedGenreNumber = 0;
         while (true) {
             System.out.print("원하는 장르 번호를 입력해주세요: ");
-            selectedGenreNumber = sc.nextInt();
+            try {
+                selectedGenreNumber = sc.nextInt();
+            }catch (InputMismatchException e) {
+                System.out.println("숫자를 입력해야 합니다. 다시 시도해주세요.");
+                sc.next(); // 입력 버퍼 초기화
+            }
 
             // 선택한 번호가 유효한지 확인
             boolean isValid = false;

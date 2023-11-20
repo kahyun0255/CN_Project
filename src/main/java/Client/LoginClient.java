@@ -27,17 +27,17 @@ public class LoginClient{
 
             //입력값 체크
             while (true) {
-                try{
+                try {
                     menuNum = sc.nextInt();
-                    if (menuNum > 2) {
-                        System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
-                    } else {
-                        break;
-                    }
                 }catch (InputMismatchException e) {
                     System.out.println("숫자를 입력해야 합니다. 다시 시도해주세요.");
-                    System.out.print("입력하세요: ");
                     sc.next(); // 입력 버퍼 초기화
+                }
+
+                if (menuNum > 2) {
+                    System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
+                } else {
+                    break;
                 }
             }
 
