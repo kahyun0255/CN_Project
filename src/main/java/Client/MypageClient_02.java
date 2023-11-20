@@ -1,15 +1,6 @@
 package Client;
 
-//import Client.Manager;
-import java.io.*;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 import org.example.MyPageObject;
-import org.example.MyPageObject.MyPageInfo;
 
 public class MypageClient_02 {
     static void MyPageClinet(Client client, MyPageObject.MyPageInfo myPageInfo)  {

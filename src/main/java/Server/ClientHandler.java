@@ -3,32 +3,22 @@ package Server;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.sun.xml.fastinfoset.tools.FI_SAX_Or_XML_SAX_DOM_SAX_SAXEvent;
-import java.util.UUID;
 import org.example.GenreSearchObject;
-import org.example.GenreSearchObject.GenreList;
 import org.example.GenreSearchObject.GenreName;
-import org.example.Login;
-import org.example.Login.LoginInfo;
 import org.example.MovieReservationObject;
 import org.example.MovieReservationObject.InputMovieDate;
 import org.example.MovieReservationObject.InputMovieTime;
-import org.example.MovieReservationObject.MovieDate;
-import org.example.MovieReservationObject.MovieName;
 import org.example.MovieReservationObject.MovieSeatNum;
 import org.example.Pair;
 
@@ -71,13 +61,11 @@ public class ClientHandler extends Thread {
 
         MovieReservationObject movieReservationObject = new MovieReservationObject();
         System.out.println("\tServer :: run()"); //FOR_DEBUG
-            //clientHandlers.add(this);  // 여기서 ClientHandler 객체를 추가
+
         try {
             while(true){
                 System.out.println(" ");
                 int data = receiveData(socket);
-
-                //System.out.printf("%d에 맞는 메뉴 실행\n",data);
 
                 if(data == LOGIN){  //LOGIN SERVICE
                     System.out.println("\t<<로그인>>");
@@ -92,7 +80,6 @@ public class ClientHandler extends Thread {
                 }
                 else if(data==MYINFO){
                     System.out.println("\t<<마이페이지>>");
-                    System.out.println("\t --사용자 아이디"+getUserId(getSessionID()));
                     MypageSever_02 myPageServer = new MypageSever_02();
 
                     Object outputMovieInfo = myPageServer.Mypage(this,getUserId(getSessionID())); //선택한 시간 보내기
@@ -179,7 +166,7 @@ public class ClientHandler extends Thread {
     }
 
     public static void sendObjectData(Socket socket, int menuNum,Object obj) throws IOException {
-        System.out.println("\tServer :: sendObjectData() ::");   //FOR DEBUG
+//        System.out.println("\tServer :: sendObjectData() ::");   //FOR DEBUG
 
         DataType=1;
         IsData=1;

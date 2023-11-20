@@ -40,13 +40,13 @@ public class Client {
         LoginClient Login = new LoginClient();
         ArrayList ClientUsers=new ArrayList<>();
 
-        System.out.println("\tClient :: main()"); //FOR_DEBUG
+//        System.out.println("\tClient :: main()"); //FOR_DEBUG
         String hostname = "localhost";
         int port = 7778;
 
         try {
             Socket socket=new Socket(hostname, port);
-            System.out.println("\tConnected to Server");
+//            System.out.println("\tConnected to Server");
 
             Client clinet = new Client(socket);
 
@@ -77,9 +77,8 @@ public class Client {
     public void loadMainMenu(Socket socket) throws IOException{
         int inputNum = 0;
 
-        System.out.println("\tClient :: loadMainMenu()"); //FOR_DEBUG
+//        System.out.println("\tClient :: loadMainMenu()"); //FOR_DEBUG
 
-        //숫자 말고 다른게 들어올 때 처리
         while(true){
             System.out.println(" ");
             System.out.println("1. 영화 예매");
@@ -164,7 +163,7 @@ public class Client {
                 GenreSearchObject.GenreList genreList=toObject(genreListObjectData, GenreList.class);
                 String genreNumber=genreSearchClient.GenreSearchList(this, genreList);
                 GenreSearchObject.GenreName genreNumObject = new GenreSearchObject.GenreName(genreNumber);
-                sendObjectData(socket, GENRE, genreNumObject); //선택한 시트 보내
+                sendObjectData(socket, GENRE, genreNumObject);
 
                 byte[] movieListObjectData=receiveObjectData(socket);
                 GenreSearchObject.GenreMovieName movieList=toObject(movieListObjectData, GenreMovieName.class);
@@ -187,11 +186,10 @@ public class Client {
 
     //send Object
     public static void sendObjectData(Socket socket, int menuNum,Object obj) throws IOException {
-        System.out.println("\tClient :: sendObjectData() ::");   //FOR DEBUG
+//        System.out.println("\tClient :: sendObjectData() ::");   //FOR DEBUG
 
         C_dataType=1;
         C_isData=1;
-
 
         //생성한 객체를 byte array로 변환
         byte[] objectData = toByteArray(obj);   //앞에 2byte엔 헤더 붙여야됨
@@ -216,7 +214,7 @@ public class Client {
 //        {
 //            System.out.printf("dataWithHeader[%d]: 0x%x\n",i, dataWithHeader[i]);
 //        }
-        System.out.printf("\tdataWithHeader data size: 0x%x\n",dataWithHeader.length); // 객체 사이즈 출력
+//        System.out.printf("\tdataWithHeader data size: 0x%x\n",dataWithHeader.length); // 객체 사이즈 출력
 
         //서버로 내보내기 위한 출력 스트림 뚫음
         OutputStream os = socket.getOutputStream();
@@ -249,7 +247,7 @@ public class Client {
     }
     ///////////RECEIVE/////////////////
     public static byte[] receiveObjectData(Socket socket) throws IOException {
-        System.out.println("\tClient :: receiveObject() ::");   //FOR DEBUG
+//        System.out.println("\tClient :: receiveObject() ::");   //FOR DEBUG
         //수신 버퍼의 최대 사이즈 지정
         int maxBufferSize = 2048; //1024
         //버퍼 생성
@@ -318,7 +316,7 @@ public class Client {
 
     //send Byte
     public static void sendData(Socket socket,int menuNum,int data)throws IOException{
-        System.out.println("\tClient :: sendData() ::");   //FOR DEBUG
+//        System.out.println("\tClient :: sendData() ::");   //FOR DEBUG
 
         OutputStream os = socket.getOutputStream();
 
@@ -334,7 +332,7 @@ public class Client {
 
         data |= header;
 
-        System.out.printf("\tSendData: 0x%x\n",data);
+//        System.out.printf("\tSendData: 0x%x\n",data);
         // 4바이트 크기의 버퍼를 생성합니다.
         byte[] buffer = new byte[4];
 
@@ -349,7 +347,7 @@ public class Client {
         C_isOK = 0;
     }
     public static int receiveData(Socket socket) throws IOException{
-        System.out.println("\tClient:: receiveData() ::");
+//        System.out.println("\tClient:: receiveData() ::");
         //서버 통신
         InputStream is = socket.getInputStream();
 
@@ -379,7 +377,7 @@ public class Client {
                 (buffer[2] << 8)  & 0x0000ff00 |
                 (buffer[3])       & 0x000000ff;
 
-        System.out.printf("\tReceived integer: 0x%x\n",value);
+//        System.out.printf("\tReceived integer: 0x%x\n",value);
 
         int recvData = parseData_de(1,value);
         //System.out.printf("recvData: 0x%x\n",recvData);
@@ -389,7 +387,7 @@ public class Client {
 
     static int parseData_de(int DataType, int value)
     {
-        System.out.printf("\tClient :: parseData_de() ::");
+//        System.out.printf("\tClient :: parseData_de() ::");
         //dataType = 1 => 헤더, 데이터 모두 전달
         //dataType = 2 => 헤더 값만 전달
         short header = 0;
@@ -402,7 +400,7 @@ public class Client {
         else if(DataType == 2){
             header = (short)value;
         }
-        System.out.printf(" h: 0x%x, d: 0x%x\n",header, data);
+//        System.out.printf(" h: 0x%x, d: 0x%x\n",header, data);
 
         C_networkType = (header >> 15) & 0x01;
         C_isError = (header >> 14) & 0x01;
@@ -413,9 +411,9 @@ public class Client {
         C_idNum = (header >> 1)& 0x1F;
         C_isOK = header & 0x1;
 
-        System.out.printf("\tnt: %x, iE: %x, eC: %x, iD: %x, dT: %x, mN: %x, iN: %x, iO:%x\n"
-                ,C_networkType,C_isError,C_errorCode,C_isData
-                ,C_dataType,C_menuNum,C_idNum,C_isOK);
+//        System.out.printf("\tnt: %x, iE: %x, eC: %x, iD: %x, dT: %x, mN: %x, iN: %x, iO:%x\n"
+//                ,C_networkType,C_isError,C_errorCode,C_isData
+//                ,C_dataType,C_menuNum,C_idNum,C_isOK);
         if(DataType == 1) {
             return data;
         }
@@ -439,7 +437,7 @@ public class Client {
                 ((C_errorCode << 11) & 0x3800)|((C_isData << 10) & 0x600)|
                 ((C_dataType << 9) & 0x200)|((C_menuNum << 6) & 0x1C0)|
                 ((C_idNum << 1) & 0x3E)|(C_isOK  & 0x1));
-        System.out.printf("\tClient :: parseData_en() :: header: 0x%x\n",header);
+//        System.out.printf("\tClient :: parseData_en() :: header: 0x%x\n",header);
         return header;
 
     }

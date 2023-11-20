@@ -1,14 +1,7 @@
-package Client;// GenreSearchClient.java
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.sql.Connection;
-import java.sql.SQLException;
+package Client;
+
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Scanner;
-import Server.GenreSearchServer;
 import org.example.GenreSearchObject;
 import org.example.Pair;
 

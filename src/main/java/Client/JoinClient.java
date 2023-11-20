@@ -3,10 +3,8 @@ package Client;
 import org.example.Join;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
-
 import static Client.Client.*;
 import static Client.Client.C_isOK;
 
@@ -15,7 +13,6 @@ public class JoinClient {
 
     public static void joinPage(Socket socket) throws IOException {
         Scanner sc = new Scanner(System.in);
-        //System.out.println("회원가입 페이지 입니다.");
 
         sendData(socket, JOIN, 2);
 

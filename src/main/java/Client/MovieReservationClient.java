@@ -1,10 +1,7 @@
 package Client;
 
-import java.io.*;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Scanner;
 import org.example.MovieReservationObject;
 import org.example.Pair;
@@ -46,7 +43,6 @@ public class MovieReservationClient {
         return MovieId;
     }
     String MovieReservationDate(Client client, MovieReservationObject.MovieDate dateArray) {
-//        ArrayList dateArray = new ArrayList<>(); //나중에 바꾸기 -> 서버에서 받아온 ArrayList로
         for (Object date : dateArray.dateArray) {
             System.out.println(date);
         }
@@ -68,8 +64,6 @@ public class MovieReservationClient {
     }
 
     String MovieReservationTime(Client client, MovieReservationObject.MovieTime timeArray) {
-
-//        ArrayList timeArray = new ArrayList<>(); //아 ArrayList로 빼놧구나 하나면 ArrayList로 안해두 될듯?
         for (Object date : timeArray.timeArray) {
             System.out.println(date);
         }
@@ -91,9 +85,9 @@ public class MovieReservationClient {
     }
 
     ArrayList MovieReservationSeat(Client client, MovieReservationObject.MovieSeat seatArray) {
-        System.out.printf("인원을 입력해주세요.(숫자만 입력해주세요.): ");
         int PeopleNum=0;
         while(true){
+            System.out.printf("인원을 입력해주세요.(숫자만 입력해주세요.): ");
             try {
                 PeopleNum = sc.nextInt();
             }catch (InputMismatchException e) {
@@ -107,8 +101,6 @@ public class MovieReservationClient {
             }
 
         }
-
-//        List<Pair<String, Boolean>> seatArray = new ArrayList<>();
 
         System.out.println("<<좌석 배치도>>");
         System.out.println("  0 1 2 3 4 5 6 7 8");
@@ -131,31 +123,41 @@ public class MovieReservationClient {
             System.out.println();
         }
 
-        ArrayList seatNum = new ArrayList<String>(); //이거 서버로 보내야함
+        ArrayList seatNum = new ArrayList<String>();
         int cnt = 0;
         while (cnt < PeopleNum) {
-            System.out.printf("좌석을 하나씩 입력해주세요(예: A-3):");
-            String SeatNum = sc.next();
-            seatNum.add(SeatNum);
-            cnt++;
+            String SeatNum = "";
+            while(true) {
+                System.out.printf("좌석을 하나씩 입력해주세요(예: A-3):");
+                SeatNum = sc.next();
+
+                if(!IsMatch.isMatch(SeatNum, "?-?")){
+                    System.out.println("입력 형태가 잘못되었습니다. A-3과 같은 형태로 입력해주세요");
+                }else if((SeatNum.charAt(0)<'A' || SeatNum.charAt(0)>'E') || (SeatNum.charAt(2)<'0'||SeatNum.charAt(2)>'8')){
+                    System.out.println("선택한 좌석이 존재하지 않는 좌석입니다. 다시 입력해주세요");
+                }else{
+                    seatNum.add(SeatNum);
+                    cnt++;
+                    break;
+                }
+            }
         }
         return seatNum;
     }
 
     int MovieReservationInfo(Client client, MovieReservationObject.MovieInfo movieInfo) {
-//        ArrayList MovieReservationInfo = new ArrayList<>(); //나중에 서버한테 클래스 형태로 받을거임 주석처리 다 빼기
         System.out.println("영화 제목 : "+movieInfo.InfoMovieName);
         System.out.println("날짜 : "+movieInfo.InfoMovieDate);
         System.out.println("시간 : "+movieInfo.InfoMovieTime);
         System.out.print("좌석 :");
-        for (Object s : movieInfo.InfoSeatNum) { //향상된 for문이 아닌 그냥 for문으로 해서 마지막 콤마 제거하기
+        for (Object s : movieInfo.InfoSeatNum) {
             System.out.print(s + ", ");
         }
 
-        System.out.println(); //여기두 주석처리 ㄷ다~~~빼기 까먹고 지우면 큰일남~~ 큰일까지는 아니겟군아;;
+        System.out.println();
         System.out.printf("정보가 맞는지 확인해주세요(Y/N): ");
 
-        int infoCheck = 0; //나중에 싹~~~지우기 확인용 다시 하기(OK / No 사인 받고 하기~~)
+        int infoCheck = 0;
         while (infoCheck == 0) {
             String str = sc.next();
             if (str.equals("Y")) {
@@ -164,28 +166,24 @@ public class MovieReservationClient {
             } else if (str.equals("N")) {
                 infoCheck = 2;
                 break;
-                // 처음부터 다시 입력받기...
             } else {
                 System.out.printf("다시 입력해주세요: ");
             }
         }
 
         if(infoCheck==1){
-            //서버한테 OK 사인 보내기
             return 1;
         }
         else if(infoCheck==2){
-            //서버한테 NO 사인 혹은 영화 예약 페이지 종료하기 -> 종료도 서버에서 하나??
             return 0;
         }
-        return 3; //이상한게 갔다는 신호
+        return 3;
     }
 }
 
 class IsMatch{
     public static boolean isMatch(String word, int n, String pattern, int m)
     {
-        // 패턴의 끝에 도달
         if (m == pattern.length()) {
             return n == word.length();
         }
