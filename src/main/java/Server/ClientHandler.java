@@ -45,7 +45,7 @@ public class ClientHandler extends Thread {
     public static final int JOIN = 2;
     public static final int RESERVATION = 5;
     public static final int GENRE = 6;
-    public static final int MYINFO = 8;
+    public static final int MYINFO = 7;
 
     public static int NetworkType = 0;
     public static int IsError = 0;
@@ -131,7 +131,10 @@ public class ClientHandler extends Thread {
                     System.out.println("\t==>정보확인");
                     int infoCheck=receiveData(socket);
                     int reservationCheck = movieReservationServer.MovieReservation(this,movieId,inputmovieDate, inputmovieTime, inputmovieSeatNum, infoCheck, userID);
-                    IsOK = 1; //이거 다시해야할듯요 reservationCheck가 1이면 예매 된거고 0 혹은 3이면 예매 안된걸루
+                    if(reservationCheck == 1)
+                        IsOK = 1;
+                    else
+                        IsOK = 0;
                     sendData(socket, 5, reservationCheck); //예매확인
                 }
                 else if(data==GENRE){

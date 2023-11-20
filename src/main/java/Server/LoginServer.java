@@ -37,7 +37,8 @@ public class LoginServer {
 
         if (rs.next()) {
             //ID Num 수정 필요
-            IdNum = 1;
+
+            IdNum = clientHandler.getSessionID();//1;
             IsOK = 1;
             sendData(socket, LOGIN | 0x4, 0);
             IsOK = 0;

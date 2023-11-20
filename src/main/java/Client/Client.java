@@ -42,7 +42,7 @@ public class Client {
     public static final int JOIN = 2;
     public static final int RESERVATION = 5;
     public static final int GENRE = 6;
-    public static final int MYINFO = 8;
+    public static final int MYINFO = 7;
     public static int C_networkType = 0;
     public static int C_isError = 0;
     public static int C_errorCode = 0;
@@ -157,25 +157,18 @@ public class Client {
                     C_isOK = 0;
                 sendData(socket, RESERVATION, InfoCheck);
                 
-                int reservationCheck=receiveData(socket);
+                int reservationCheck = receiveData(socket);
                 if(reservationCheck ==0){
-                    C_isOK=0;
+                    System.out.println("예매가 취소되었습니다. 다시 시도해주세요");
                 }
                 else if(reservationCheck==1){
-                    C_isOK=1;
+                    System.out.println("예매가 완료되었습니다.");
                 }
                 else if(reservationCheck==3){
                     System.out.println("다른 사용자가 이미 선택한 좌석입니다.");
-                    C_isOK=0;
+
                 }
-                
-                if(C_isOK == 1)
-                    System.out.println("예매가 완료되었습니다.");
-                else
-                    System.out.println("예매가 취소되었습니다. 다시 시도해주세요");
-
                 C_isOK = 0;
-
             }
             else if(inputNum==2){
                 GenreSearchClient genreSearchClient = new GenreSearchClient();

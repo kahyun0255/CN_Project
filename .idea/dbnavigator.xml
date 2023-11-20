@@ -20,7 +20,9 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="0156a54c-fbe0-4d43-aca2-a4fd823803cf" object-ref="schemas/comnet/tables/userinfo" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="0156a54c-fbe0-4d43-aca2-a4fd823803cf" dataset="comnet.userinfo" active-filter-id="" />

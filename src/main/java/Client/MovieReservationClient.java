@@ -153,7 +153,7 @@ public class MovieReservationClient {
                 break;
                 // 처음부터 다시 입력받기...
             } else {
-                System.out.println("다시 입력해주세요.");
+                System.out.printf("다시 입력해주세요: ");
             }
         }
 
