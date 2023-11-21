@@ -12,7 +12,7 @@ public class MypageClient_02 {
             System.out.println("이름 : " + myPageInfo.name);
 
             for(MyPageObject.MyPageMovieInfo myPage : myPageInfo.movieInfo){
-                System.out.println("-----------------");
+                System.out.println("--------------------------------------------");
                 System.out.println("영화 제목 : "+myPage.MovieName);
                 System.out.println("예약 날짜 : "+myPage.Date);
                 System.out.println("예약 시간 : "+myPage.Time);
